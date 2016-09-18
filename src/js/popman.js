@@ -102,33 +102,19 @@ PopMan.prototype.spreadDark = function(pop){
 PopMan.prototype.adjustPossition = function(name, callback){
     var pop = this.popMap[name];
     var popEl = pop.popEl;
-    var ml = pop.marginLeft;
-    var mt = pop.marginTop;
-    var mr = pop.marginRight;
-    var mb =pop.marginBottom;
-    var w = pop.width;
-    var h = pop.height;    
     var parentW = popEl.parentNode.offsetWidth;
     var parentH = popEl.parentNode.offsetHeight;
     parentH = (parentH == 0) ? this.getDivCamSizeChecker().offsetHeight : parentH;
     popEl.style.position = 'absolute';
+    // var ml = pop.marginLeft;
+    // var mt = pop.marginTop;
+    // var mr = pop.marginRight;
+    // var mb =pop.marginBottom;
+    // var w = pop.width;
+    // var h = pop.height;    
     // popexp
     var xPopExpMap = this.getSolvedPopExpMap(parentW, pop.expx);
-    var yPopExpMap = this.getSolvedPopExpMap(parentH, pop.expy);
-    // if (!xPopExpMap.isPopExp){
-    //     if (0 <= xPopExpMap.size){
-    //         pos = xPopExpMap.size;
-    //     }else{
-    //         pos = (parentSize / 2) - (popEl.offsetWidth / 2);
-    //     }    
-    // }
-    // if (!yPopExpMap.isPopExp){
-    //     if (0 <= xPopExpMap.size){
-    //         pos = xPopExpMap.size;
-    //     }else{
-    //         pos = (parentSize / 2) - (popEl.offsetHeight / 2);
-    //     }    
-    // }       
+    var yPopExpMap = this.getSolvedPopExpMap(parentH, pop.expy);    
     function nvlDan(num, dan){
         var allLeng = (num+'').length;
         var onlyNumLeng = (parseFloat(num)+'').length;
@@ -145,6 +131,7 @@ PopMan.prototype.adjustPossition = function(name, callback){
 };
 PopMan.prototype.getSolvedPopExpMap = function(parentSize, popexp){    
     var getSize = this.getSize;
+    var popExpMap;
     var expStart;
     var expSize;
     var expEnd;
@@ -165,9 +152,7 @@ PopMan.prototype.getSolvedPopExpMap = function(parentSize, popexp){
             expStart = '*';
             expSize = popexp;
             expEnd = '*';
-        }
-    }
-    // if (isPopExp){              
+        }        
         start = getSize(parentSize, expStart);        
         size = getSize(parentSize, expSize);
         end = getSize(parentSize, expEnd);     
@@ -182,16 +167,16 @@ PopMan.prototype.getSolvedPopExpMap = function(parentSize, popexp){
             pos = (parentSize - size) / 2;
         }else{
             pos = start;
-        }        
-    // }
-    var popExpMap = {
-        isPopExp:isPopExp,
-        expStart:expStart,
-        expEnd:expEnd,
-        expSize:expSize,
-        pos:pos,
-        size:size
-    };        
+        }
+        popExpMap = {
+            isPopExp:isPopExp,
+            expStart:expStart,
+            expEnd:expEnd,
+            expSize:expSize,
+            pos:pos,
+            size:size
+        };
+    }    
     return popExpMap;
 };
 PopMan.prototype.getSize = function(parentSize, num){

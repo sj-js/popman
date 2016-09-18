@@ -1,16 +1,3 @@
-
-
-<!--/////////////////////////
-//////////////////////////////
-
-- WebStorage(LocalStorage, SessionStorage)
-- Worker
-- XMLHttpRequest(save)
-
-
-//////////////////////////////
-/////////////////////////-->
-
 <!DOCTYPE html>
 <HTML> 
 	<meta charset="utf-8" />	
@@ -39,35 +26,20 @@
 		
 		<script>
 			var popMan = new PopMan();			
-			window.onload = function(event){
-				popMan.set
+			window.onload = function(event){				
 				popMan.add({
 				    name:'dev1',
-				//    width:'60%',
-				//    height:'500',
-				//    marginLeft:'100',
-				//    marginTop:'100',
-				//    marginRight:'100',
-				//    marginBottom:'100',
 				    expx:'90%',
 				    expy:'*',
 				    easyclose:true,
 				    // add:$('#popup-dev')[0],
-				   add:function(data){
-				       console.log('When add');
-				       console.log(data);
-				       data.popEl.innerHTML = 'hahahahaa<br/><br/>';
-				       // $(data.popEl).append('<button id="closen">close</button>');
-				       // $(data.popEl).append('<button id="stick">stick</button>');
-				       // $('#closen').click(function(){
-				       //     popMan.close('dev1');
-				       // });
-				       // $('#stick').click(function(){
-				       //     devStick = true;
-				       // });
-				   },
+					add:function(data){
+					   console.log('When add');
+					   console.log(data);
+					   data.popEl.innerHTML = 'hahahahaa<br/><br/>';					   
+					},
 				    pop:function(data){
-				        console.log('When pop');				        
+				        console.log('When pop');
 				    },
 				    close:function(data){
 				        console.log('When close');
@@ -81,6 +53,11 @@
 
 	<body>
 		<button onclick="popMan.pop('dev1')"></button>
+
+		<button onclick="popMan.focusOn(fff)"></button>
+
+		<button id='fff' onclick="popMan.focusOff()"></button>
+
 		<div data-box data-type="">
 			하하하하
 		</div>
