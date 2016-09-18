@@ -1,0 +1,32 @@
+{
+  "name": "popman",
+  "description": "popman",
+  "main": "dist/popman.min.js",
+  "authors": [
+    "SJ <souljungkim@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "boxMan",
+    "drag",
+    "drop",
+    "div",
+    "movable",
+    "put"
+  ],
+  "homepage": "https://github.com/souljungkim/popman",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "bower.json",
+    "gulpfile.js",
+    "package.json",
+    "src",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "crossman": "*"
+  }
+}
