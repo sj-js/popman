@@ -5,7 +5,7 @@
 
 ### 1) 등록
 
-```
+```js
 popMan.add({
     name:'dev1',
     expx:'90%',
@@ -30,7 +30,7 @@ popMan.add({
 
 ### 2) 열기
 
-```
+```js
 popMan.pop('dev1');
 ```
 
@@ -38,7 +38,7 @@ popMan.pop('dev1');
 
 ### 3) 닫기
 
-```
+```js
 popMan.close('dev1');
 ```
 
@@ -52,12 +52,16 @@ popMan.close('dev1');
 
 ### 1) 비추기 ON
 
-```
+```js
 popMan.focusOn(element);
 ```
 
 ### 2) 비추기 OFF
 
-```
+```js
 popMan.focusOff();
 ```
+
+
+
+
