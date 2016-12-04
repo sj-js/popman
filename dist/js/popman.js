@@ -14,6 +14,8 @@ window.getNewEl = function(elNm, id, classNm, attrs, inner, eventNm, eventFunc){
 
 
 
+
+
 window.getEl = function(id){
 
     var querySelectorAll = function(selector){
@@ -83,30 +85,7 @@ window.getEl = function(id){
             }
         };
         return classFuncs;
-    }());
-    this.findEl = function(attr, val){
-        var subEls = el.children;
-        for (var i=0; i<subEls.length; i++){
-            if (subEls[i].getAttribute(attr) == val) return subEls[i];          
-        }                   
-    };
-    this.findParentEl = function(attr, val){
-        var foundEl;
-        var parentEl = el;      
-        while(parentEl){
-            if (parentEl != document.body.parentNode){
-                if (parentEl.getAttribute(attr) == val){
-                    foundEl = parentEl;
-                    break;              
-                }
-            }else{
-                foundEl = null;
-                break;
-            }
-            parentEl = parentEl.parentNode;
-        }       
-        return foundEl;
-    };
+    }());    
     this.add = function(appender){
         if (typeof appender == 'object') 
             el.appendChild(appender);
@@ -130,17 +109,17 @@ window.getEl = function(id){
         return this;
     };
     this.addEventListener = function(eventNm, fn){      
-        /* FireFox는 이 작업을 선행하게 하여 window.event객체를 전역으로 돌려야한다.*/
+        /* FireFox */
         if (navigator.userAgent.indexOf('Firefox') != -1){  
             el.addEventListener(eventNm, function(e){window.event=e;}, true);
         }       
-        /* 일반 */
+        /* general */
         if (el.addEventListener){           
             el.addEventListener(eventNm, function(event){
                 fn(event);
                 // fn(event, getEventTarget(event)); 
             });     
-        /* 옛 IE */
+        /* IE8 */
         }else{                      
             el.attachEvent('on'+eventNm, function(event){               
                 if (!event.target && event.srcElement) event.target = event.srcElement;
@@ -149,7 +128,7 @@ window.getEl = function(id){
             });         
         }
         return;
-    };  
+    };    
     this.del = function(removeElObj){
         el.removeChild(removeElObj);
         return this;
@@ -174,6 +153,9 @@ window.getEl = function(id){
         if (typeof el.style.MozUserSelect != 'undefined') document.body.style.MozUserSelect = 'none';
         return this;
     };
+
+
+
     this.hideDiv = function(){          
         el.style.display = 'block';
         el.style.position = 'absolute';
@@ -195,6 +177,114 @@ window.getEl = function(id){
         }       
         return null;
     };
+
+
+
+
+
+    
+    this.isAccepted = function(acceptObj, rejectObj){    
+        var isOk = false;    
+        if (acceptObj){
+            if (this.find(acceptObj)){
+                isOk = true;
+            }
+        }else{
+            isOk = true;
+        }
+        if (rejectObj){
+            if (this.find(rejectObj)){
+                isOk = false;
+            }
+        }
+        return isOk;
+    };
+    this.find = function(param){    
+        if (el instanceof Array){
+            var results = [];
+            for (var i=0; i<el.length; i++){            
+                var matchedObj = this.getMatchedObjWithParam(el[i], param);
+                if (matchedObj) 
+                    results.push(matchedObj);
+            }        
+            return results;
+        }
+        if (el instanceof Object){ 
+            var matchedObj = this.getMatchedObjWithParam(el, param);
+            return matchedObj;
+        }        
+    };
+
+    // Param==Array => Or조건
+    // Param==Object => 해당조건
+    this.getMatchedObjWithParam = function(obj, param){
+        if (typeof param == 'string'){        
+            param = {id:param};
+        }
+        if (param instanceof Array){        
+            for (var i=0; i<param.length; i++){            
+                if (this.find(param[i])) return obj;
+            }
+            return;
+        }
+        if (param instanceof Object){        
+            var keys = Object.keys(param);        
+            for (var i=0; i<keys.length; i++){
+                var key = keys[i];
+                if ( !(obj[key] && obj[key] == param[key]) ){
+                    return;
+                }
+            }              
+            return obj;
+        }    
+    };
+
+    // Find HTMLDOMElement 
+    this.findDomDataAttribute = function(param){    
+        if (el instanceof Array){
+            var results = [];
+            for (var i=0; i<el.length; i++){            
+                var matchedObj = this.getMatchedDomWithParam(el[i], param);
+                if (matchedObj) 
+                    results.push(matchedObj);
+            }        
+            return results;
+        }
+        if (el instanceof Object){ 
+            var matchedObj = this.getMatchedDomWithParam(el, param);
+            return matchedObj;
+        }        
+    };    
+
+    // Param==Array => Or조건
+    // Param==Object => 해당조건
+    this.getMatchedDomWithParam = function(obj, param){
+        if (typeof param == 'string'){        
+            param = {id:param};
+        }
+        if (param instanceof Array){        
+            for (var i=0; i<param.length; i++){            
+                if (this.findDomDataAttribute(param[i])) return obj;
+            }
+            return;
+        }
+        if (param instanceof Object){        
+            var keys = Object.keys(param);
+            var domAttrPrefix = "data-";
+            for (var i=0; i<keys.length; i++){
+                var key = keys[i];
+                if ( !(obj.getAttribute(domAttrPrefix+key) && obj.getAttribute(domAttrPrefix+key) == param[key]) ){
+                    return;
+                }
+            }              
+            return obj;
+        }    
+    };
+
+
+
+
+
     this.getParentEl = function(attrNm){
         var searchSuperObj = el;
         while(searchSuperObj){
@@ -202,6 +292,62 @@ window.getEl = function(id){
             searchSuperObj = searchSuperObj.parentNode;
         }
         return searchSuperObj;
+    };
+    this.findEl = function(attr, val){
+        var subEls = el.children;
+        for (var i=0; i<subEls.length; i++){
+            if (subEls[i].getAttribute(attr) == val) return subEls[i];          
+        }                   
+    };
+    this.findParentEl = function(attr, val){
+        var foundEl;
+        var parentEl = el;      
+        while(parentEl){
+            if (parentEl != document.body.parentNode){
+                if (parentEl.getAttribute(attr) == val){
+                    foundEl = parentEl;
+                    break;              
+                }
+            }else{
+                foundEl = null;
+                break;
+            }
+            parentEl = parentEl.parentNode;
+        }       
+        return foundEl;
+    };
+    return this;
+};
+
+
+
+
+
+window.getData = function(obj){
+  
+    var obj = obj;
+
+    this.parse = function(){
+        if (obj){
+            var startStr = obj.substr(0, 1);
+            var endStr = obj.substr(obj.length-1, 1);
+            if (typeof obj == 'string'){
+                if (startStr == '{' && endStr == '}'){
+                    return JSON.parse(obj);
+
+                }else if (startStr == '[' && endStr == ']'){
+                    return JSON.parse(obj);
+
+                }else if (obj.indexOf(',') != -1){
+                    var list = obj.split(',');
+                    for (var i=0; i<list.length; i++){
+                        list[i] = list[i].trim();
+                    }
+                    return list;
+                }
+            }
+            return obj;
+        }        
     };
 
     return this;
@@ -211,10 +357,11 @@ window.getEl = function(id){
 
 
 
-
+/////////////////////////
+// requestAnimationFrame
+/////////////////////////
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
- 
+// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating 
 // requestAnimationFrame polyfill by Erik Möller
 // fixes from Paul Irish and Tino Zijdel 
 (function() {
@@ -245,9 +392,9 @@ window.getEl = function(id){
 
 
 
-/**************/
-/* 파일  객체 */
-/**************/
+/////////////////////////
+// File
+/////////////////////////
 (function(){
     window.URL = window.URL || window.webkitURL;
     window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
@@ -255,9 +402,9 @@ window.getEl = function(id){
 
 
 
-/**************/
-/* EVENT 객체 */
-/**************/
+/////////////////////////
+// window.addEventListener
+/////////////////////////
 (function(){
     /* FireFox는 이 작업을 선행하게 하여 window.event객체를 전역으로 돌려야한다.*/
     if (navigator.userAgent.indexOf('Firefox') != -1){  
@@ -280,10 +427,9 @@ window.getEl = function(id){
     }
 }());
 
-
-/******************/
-/* 필수 구현 객체 */
-/******************/
+/////////////////////////
+// Array.indexOf
+/////////////////////////
 (function(){
     if (!Array.prototype.indexOf){
         Array.prototype.indexOf = function(obj){
@@ -296,7 +442,9 @@ window.getEl = function(id){
 }());
 
 
-
+/////////////////////////
+// querySelectorAll
+/////////////////////////
 (function(){
     if (!document.querySelectorAll){
         if(document.getElementsByTagName){
@@ -325,7 +473,60 @@ window.getEl = function(id){
     }    
 }());
 
+/////////////////////////
+// getComputedStyle
+/////////////////////////
+/* for IE */
+(function(){
+    if (!window.getComputedStyle) {
+        window.getComputedStyle = function(element){
+            return element.currentStyle;
+        }
+    }
+})();
 
+/////////////////////////
+// JSON.stringify, JSON.parse
+/////////////////////////
+(function(){
+    if (!JSON){
+        // implement JSON.stringify serialization
+        JSON.stringify = JSON.stringify || function (obj) {
+
+            var t = typeof (obj);
+            if (t != "object" || obj === null) {
+
+                // simple data type
+                if (t == "string") obj = '"'+obj+'"';
+                return String(obj);
+
+            }
+            else {
+
+                // recurse array or object
+                var n, v, json = [], arr = (obj && obj.constructor == Array);
+
+                for (n in obj) {
+                    v = obj[n]; t = typeof(v);
+
+                    if (t == "string") v = '"'+v+'"';
+                    else if (t == "object" && v !== null) v = JSON.stringify(v);
+
+                    json.push((arr ? "" : '"' + n + '":') + String(v));
+                }
+
+                return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
+            }
+        };
+
+        // implement JSON.parse de-serialization
+        JSON.parse = JSON.parse || function (str) {
+            if (str === "") str = '""';
+            eval("var p=" + str + ";");
+            return p;
+        };
+    }
+}());
 /****************************************************************************************************
  *  PopMan
  *  Created By sujkim
@@ -345,16 +546,27 @@ function PopMan(){
     });
 }
 
+PopMan.prototype.detect= function(infoObj){
+    var setedObjs = sjHelper.cross.querySelectorAll('[data-pop]');  
+    for (var j=0; j<setedObjs.length; j++){
+        var obj = setedObjs[j];
+        // if (obj.isAdaptedDarkPop) continue;
+        // obj.isAdaptedDarkPop = true;
+        var name = obj.getAttribute('data-pop');
+        this.add(name, obj);
+    }
+};
+
 PopMan.prototype.add = function(infoObj){
     var that = this;
-    var zIndex = 100;
+    // var zIndex = that.findHighestZIndex() + 1;
     // popView
     var popView = document.createElement('div');
     popView.style.display = 'inline-block';
     popView.style.background = 'white';
     popView.style.width = (infoObj.width) ? infoObj.width : 0;
     popView.style.height = (infoObj.height) ? infoObj.height : 0;
-    popView.style.zIndex = zIndex;
+    // popView.style.zIndex = zIndex;
     getEl(popView).addEventListener('click', function(event){
         event.preventDefault();
         event.stopPropagation();
@@ -478,7 +690,7 @@ PopMan.prototype.getDivCamSizeChecker = function(){
 };
 PopMan.prototype.spreadDark = function(pop){
     var that = this;    
-    var zIndex = 100;
+    var zIndex = that.findHighestZIndex() + 1;
     var color = 'rgba(0,0,0,.7)';
     // dark
     var darkEl = document.createElement('div');
@@ -589,7 +801,17 @@ PopMan.prototype.getSolvedPopExpMap = function(parentSize, popexp){
             pos:pos,
             size:size
         };
-    }    
+    // Default Setting - If (popexp == '') 
+    }else{
+        popExpMap = {
+            isPopExp:false,
+            expStart:expStart,
+            expEnd:expEnd,
+            expSize:expSize,
+            pos:parentSize - (parentSize/2) - (parentSize/4),
+            size:parentSize/2
+        };
+    }
     return popExpMap;
 };
 PopMan.prototype.getSize = function(parentSize, num){
@@ -715,7 +937,30 @@ PopMan.prototype.setBackgroundColor = function(el, color){
         el.style.background = color;
     }
 };
-
+PopMan.prototype.findHighestZIndex = function(tagName){
+    var highestIndex = 0;
+    //Makes parameter array
+    if (!tagName){
+        tagName = ['div'];
+    }else if (typeof tagName == 'string'){
+        tagName = [tagName];
+    }
+    //Search
+    if (tagName instanceof Array){        
+        for (var i=0; i<tagName.length; i++){
+            var elementList = document.getElementsByTagName(tagName[0]);            
+            for (var i=0; i<elementList.length; i++){
+                var zIndex = document.defaultView.getComputedStyle(elementList[i], null).getPropertyValue("z-index");
+                if (zIndex > highestIndex && zIndex != 'auto'){
+                    highestIndex = zIndex;
+                }
+            }    
+        }    
+    }else{
+        console.log('Could not get highest z-index. because, not good parameter', tagName);
+    }
+    return parseInt(highestIndex);
+};
 
 
 
