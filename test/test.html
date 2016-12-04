@@ -26,17 +26,41 @@
 		
 		<script>
 			var popMan = new PopMan();			
-			window.onload = function(event){				
+			window.onload = function(event){
+				// popMan.set({
+				// });
 				popMan.add({
 				    name:'dev1',
 				    expx:'90%',
-				    expy:'*',
+				    expy:'90%',
 				    easyclose:true,
 				    // add:$('#popup-dev')[0],
 					add:function(data){
-					   console.log('When add');
-					   console.log(data);
-					   data.popEl.innerHTML = 'hahahahaa<br/><br/>';					   
+						console.log('When add');
+						console.log(data);
+						data.popEl.innerHTML = 'hahahahaa<br/><br/>';					   
+						var a = document.getElementById('bbb');
+						data.popEl.appendChild(a.cloneNode(true));
+					},
+				    pop:function(data){
+				        console.log('When pop');
+				    },
+				    close:function(data){
+				        console.log('When close');
+				    }
+				});
+				popMan.add({
+				    name:'dev2',
+				    expx:'50%',
+				    expy:'50%',
+				    easyclose:true,
+				    // add:$('#popup-dev')[0],
+					add:function(data){
+						console.log('When add');
+						console.log(data);
+						data.popEl.innerHTML = 'hahahahaa<br/><br/>';					   
+						var a = document.getElementById('bbb');
+						data.popEl.appendChild(a.cloneNode(true));
 					},
 				    pop:function(data){
 				        console.log('When pop');
@@ -52,7 +76,8 @@
 
 
 	<body>
-		<button onclick="popMan.pop('dev1')"></button>
+		<button id='aaa' onclick="popMan.pop('dev1')"></button>
+		<button id='bbb' onclick="popMan.pop('dev2')"></button>
 
 		<button onclick="popMan.focusOn(fff)"></button>
 

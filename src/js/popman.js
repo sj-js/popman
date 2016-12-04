@@ -17,16 +17,27 @@ function PopMan(){
     });
 }
 
+PopMan.prototype.detect= function(infoObj){
+    var setedObjs = sjHelper.cross.querySelectorAll('[data-pop]');  
+    for (var j=0; j<setedObjs.length; j++){
+        var obj = setedObjs[j];
+        // if (obj.isAdaptedDarkPop) continue;
+        // obj.isAdaptedDarkPop = true;
+        var name = obj.getAttribute('data-pop');
+        this.add(name, obj);
+    }
+};
+
 PopMan.prototype.add = function(infoObj){
     var that = this;
-    var zIndex = 100;
+    // var zIndex = that.findHighestZIndex() + 1;
     // popView
     var popView = document.createElement('div');
     popView.style.display = 'inline-block';
     popView.style.background = 'white';
     popView.style.width = (infoObj.width) ? infoObj.width : 0;
     popView.style.height = (infoObj.height) ? infoObj.height : 0;
-    popView.style.zIndex = zIndex;
+    // popView.style.zIndex = zIndex;
     getEl(popView).addEventListener('click', function(event){
         event.preventDefault();
         event.stopPropagation();
@@ -150,7 +161,7 @@ PopMan.prototype.getDivCamSizeChecker = function(){
 };
 PopMan.prototype.spreadDark = function(pop){
     var that = this;    
-    var zIndex = 100;
+    var zIndex = that.findHighestZIndex() + 1;
     var color = 'rgba(0,0,0,.7)';
     // dark
     var darkEl = document.createElement('div');
@@ -261,7 +272,17 @@ PopMan.prototype.getSolvedPopExpMap = function(parentSize, popexp){
             pos:pos,
             size:size
         };
-    }    
+    // Default Setting - If (popexp == '') 
+    }else{
+        popExpMap = {
+            isPopExp:false,
+            expStart:expStart,
+            expEnd:expEnd,
+            expSize:expSize,
+            pos:parentSize - (parentSize/2) - (parentSize/4),
+            size:parentSize/2
+        };
+    }
     return popExpMap;
 };
 PopMan.prototype.getSize = function(parentSize, num){
@@ -387,7 +408,30 @@ PopMan.prototype.setBackgroundColor = function(el, color){
         el.style.background = color;
     }
 };
-
+PopMan.prototype.findHighestZIndex = function(tagName){
+    var highestIndex = 0;
+    //Makes parameter array
+    if (!tagName){
+        tagName = ['div'];
+    }else if (typeof tagName == 'string'){
+        tagName = [tagName];
+    }
+    //Search
+    if (tagName instanceof Array){        
+        for (var i=0; i<tagName.length; i++){
+            var elementList = document.getElementsByTagName(tagName[0]);            
+            for (var i=0; i<elementList.length; i++){
+                var zIndex = document.defaultView.getComputedStyle(elementList[i], null).getPropertyValue("z-index");
+                if (zIndex > highestIndex && zIndex != 'auto'){
+                    highestIndex = zIndex;
+                }
+            }    
+        }    
+    }else{
+        console.log('Could not get highest z-index. because, not good parameter', tagName);
+    }
+    return parseInt(highestIndex);
+};
 
 
 

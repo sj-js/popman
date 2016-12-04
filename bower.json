@@ -1,7 +1,7 @@
 {
   "name": "popman",
   "description": "popman",
-  "main": "dist/popman.min.js",
+  "main": "dist/js/popman.min.js",
   "authors": [
     "SJ <souljungkim@gmail.com>"
   ],

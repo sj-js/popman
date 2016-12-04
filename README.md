@@ -64,4 +64,28 @@ popMan.focusOff();
 
 
 
+# 3. 안내하기 (구상중)
 
+.start();
+.before();
+.next();
+.stop();
+
+
+[
+	{
+		id:'guide1', 
+		basepath:'aaa/bbb/ccc',
+		frame:'',
+		focusOn:el,
+		next:'',
+		time:5000,
+		pop:[]
+		if:{
+			'aaa/bbb/ccc':''
+		}
+	},
+	{
+
+	}
+]
