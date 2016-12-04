@@ -558,33 +558,42 @@ PopMan.prototype.detect= function(infoObj){
 };
 
 PopMan.prototype.add = function(infoObj){
-    var that = this;
-    // var zIndex = that.findHighestZIndex() + 1;
+    var that = this;    
+    var name = infoObj.name;
     // popView
     var popView = document.createElement('div');
+    // popView - Style
     popView.style.display = 'inline-block';
     popView.style.background = 'white';
-    popView.style.width = (infoObj.width) ? infoObj.width : 0;
-    popView.style.height = (infoObj.height) ? infoObj.height : 0;
-    // popView.style.zIndex = zIndex;
+    popView.style.width = (infoObj.width) ? infoObj.width : '100%';
+    popView.style.height = (infoObj.height) ? infoObj.height : '100%';
+    popView.style.overflow = 'auto';
+    getEl(popView).hideDiv();
+    // popView - Event
     getEl(popView).addEventListener('click', function(event){
         event.preventDefault();
         event.stopPropagation();
-    });
-    this.popMap[infoObj.name] = infoObj;
-    this.popMap[infoObj.name].popEl = popView;
-    this.popMap[infoObj.name].darkEl = null;
-    this.popMap[infoObj.name].isPoped = false;
-    //Create Event
-    getEl(popView).hideDiv();
-    getEl(document.body).add(popView);
-
+    });    
+    // popView -> body
+    getEl(document.body).add(popView);    
+    // popView <- Some Dom
     var addObj = infoObj.add;
     if (typeof addObj == 'function'){
-        infoObj.add(infoObj);
-    }else if (typeof addObj == 'object'){
-        popView.appendChild(addObj);
+        addObj(infoObj);        
+    }else if (typeof addObj == 'object'){        
+        getEl(popView).add(addObj);
+        // addObj.style.display = 'block';
+        // addObj.style.position = ''; 
+        // addObj.style.left = '0px';
+        // addObj.style.top = '0px';
+        // addObj.style.width = '100%';
+        // addObj.style.height = '100%';        
     }
+    // Save
+    this.popMap[name] = infoObj;
+    this.popMap[name].popEl = popView;
+    this.popMap[name].darkEl = null;
+    this.popMap[name].isPoped = false;
     return this;
 };
 
@@ -612,7 +621,7 @@ PopMan.prototype.pop = function(name, callback){
             getEl(document.body).add(pop.popEl);
         }
         this.adjustPossition(name);
-        pop.isPoped = true;
+        pop.isPoped = true;        
         if (callback) callback();
     }
 };
@@ -704,7 +713,8 @@ PopMan.prototype.spreadDark = function(pop){
     }
     getEl(darkEl).showDiv();
     getEl(document.body).add(darkEl);
-
+    
+    darkEl.style.display = 'block';
     darkEl.style.width = '100%';
     darkEl.style.height = '100%';
     darkEl.style.zIndex = zIndex;
