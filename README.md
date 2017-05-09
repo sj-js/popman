@@ -89,3 +89,29 @@ popMan.focusOff();
 
 	}
 ]
+
+
+
+
+/////////////////////////
+// 구성
+/////////////////////////
+
+popman.detect()
+add
+popman.isOn()
+toggle
+pop
+close
+focusOn
+focusOff
+getDivCamSizeChecker
+spreadDark
+adjustPossition
+getSolvedPopExpMap
+getSize
+closeDark
+getDarkEl
+getBodyOffset
+getFrameOffset
+setBackgroundColor

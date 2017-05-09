@@ -2,18 +2,9 @@
   "name": "popman",
   "description": "popman",
   "main": "dist/js/popman.min.js",
-  "authors": [
-    "SJ <souljungkim@gmail.com>"
-  ],
+  "authors": ["SJ <souljungkim@gmail.com>"],
   "license": "MIT",
-  "keywords": [
-    "boxMan",
-    "drag",
-    "drop",
-    "div",
-    "movable",
-    "put"
-  ],
+  "keywords": ["popman", "pop", "no popup"],
   "homepage": "https://github.com/souljungkim/popman",
   "ignore": [
     "**/.*",

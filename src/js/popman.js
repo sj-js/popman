@@ -1,3 +1,4 @@
+
 /****************************************************************************************************
  *  PopMan
  *  Created By sujkim
@@ -8,24 +9,32 @@ function PopMan(){
     this.popMap = {};
     this.darkList = [];
     this.focusDarkMap = {};
+    this.lastPopIndex = 0;
     this.divCamSizeChecker;
-    window.addEventListener('resize', function(event){
-        for (var name  in that.popMap){
-            if (that.isOn(name))
-                that.adjustPossition(name);
-        }
+    getEl().ready(function(){
+        getEl().resize(function(){
+            for (var name in that.popMap){
+                if (that.isOn(name))
+                    that.adjustPossition(name);
+            }
+        });
     });
+    return this;
 }
 
 PopMan.prototype.detect= function(infoObj){
-    var setedObjs = sjHelper.cross.querySelectorAll('[data-pop]');  
-    for (var j=0; j<setedObjs.length; j++){
-        var obj = setedObjs[j];
-        // if (obj.isAdaptedDarkPop) continue;
-        // obj.isAdaptedDarkPop = true;
-        var name = obj.getAttribute('data-pop');
-        this.add(name, obj);
-    }
+    var that = this;
+    getEl().ready(function(){
+        var setedObjs = document.querySelectorAll('[data-pop]');
+        for (var j=0; j<setedObjs.length; j++){
+            var obj = setedObjs[j];
+            // if (obj.isAdaptedDarkPop) continue;
+            // obj.isAdaptedDarkPop = true;
+            var name = obj.getAttribute('data-pop');
+            that.add(name, obj);
+        }
+    });
+    return this;
 };
 
 PopMan.prototype.add = function(infoObj){
@@ -38,7 +47,7 @@ PopMan.prototype.add = function(infoObj){
     popView.style.background = 'white';
     popView.style.width = (infoObj.width) ? infoObj.width : '100%';
     popView.style.height = (infoObj.height) ? infoObj.height : '100%';
-    popView.style.overflow = 'auto';
+    popView.style.overflow = 'hidden';
     getEl(popView).hideDiv();
     // popView - Event
     getEl(popView).addEventListener('click', function(event){
@@ -53,12 +62,12 @@ PopMan.prototype.add = function(infoObj){
         addObj(infoObj);        
     }else if (typeof addObj == 'object'){        
         getEl(popView).add(addObj);
-        // addObj.style.display = 'block';
+        addObj.style.display = 'block';
         // addObj.style.position = ''; 
         // addObj.style.left = '0px';
         // addObj.style.top = '0px';
-        // addObj.style.width = '100%';
-        // addObj.style.height = '100%';        
+        addObj.style.width = '100%';
+        addObj.style.height = '100%';
     }
     // Save
     this.popMap[name] = infoObj;
@@ -82,6 +91,9 @@ PopMan.prototype.toggle = function(name){
 
 PopMan.prototype.pop = function(name, callback){    
     var pop = this.popMap[name];
+    var userSetPopElement = pop.popEl.children[0];
+    userSetPopElement.popIndex = (++this.lastPopIndex);
+    userSetPopElement.setAttribute('data-pop-index', userSetPopElement.popIndex);
     if (!pop.isPoped){
         if (pop.pop)
             pop.pop(pop);
@@ -170,7 +182,7 @@ PopMan.prototype.getDivCamSizeChecker = function(){
 };
 PopMan.prototype.spreadDark = function(pop){
     var that = this;    
-    var zIndex = that.findHighestZIndex() + 1;
+    var zIndex = getData().findHighestZIndex(['div']) + 1;
     var color = 'rgba(0,0,0,.7)';
     // dark
     var darkEl = document.createElement('div');
@@ -380,8 +392,8 @@ PopMan.prototype.getBodyOffset = function (objTemp){
                 sumOffsetLeft += thisObj.offsetLeft - scrollX;
                 sumOffsetTop += thisObj.offsetTop - scrollY;
             }else if(parentObj.style.position == 'fixed' || thisObj.style.position == 'fixed'){
-                sumOffsetLeft += thisObj.offsetLeft + sjHelper.cross.getBodyScrollX();
-                sumOffsetTop += thisObj.offsetTop + sjHelper.cross.getBodyScrollY();
+                sumOffsetLeft += thisObj.offsetLeft + this.getBodyScrollX();
+                sumOffsetTop += thisObj.offsetTop + this.getBodyScrollY();
                 break;
             }else{
                 sumOffsetLeft += (thisObj.offsetLeft - parentObj.offsetLeft) - scrollX;
@@ -418,30 +430,7 @@ PopMan.prototype.setBackgroundColor = function(el, color){
         el.style.background = color;
     }
 };
-PopMan.prototype.findHighestZIndex = function(tagName){
-    var highestIndex = 0;
-    //Makes parameter array
-    if (!tagName){
-        tagName = ['div'];
-    }else if (typeof tagName == 'string'){
-        tagName = [tagName];
-    }
-    //Search
-    if (tagName instanceof Array){        
-        for (var i=0; i<tagName.length; i++){
-            var elementList = document.getElementsByTagName(tagName[0]);            
-            for (var i=0; i<elementList.length; i++){
-                var zIndex = document.defaultView.getComputedStyle(elementList[i], null).getPropertyValue("z-index");
-                if (zIndex > highestIndex && zIndex != 'auto'){
-                    highestIndex = zIndex;
-                }
-            }    
-        }    
-    }else{
-        console.log('Could not get highest z-index. because, not good parameter', tagName);
-    }
-    return parseInt(highestIndex);
-};
+
 
 
 
