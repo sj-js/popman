@@ -1,48 +1,180 @@
-
 /****************************************************************************************************
  *  PopMan
  *  Created By sujkim
  ****************************************************************************************************/
-
 function PopMan(){
     var that = this;
+    this.event = new SjEvent();
+
     this.popMap = {};
-    this.darkList = [];
+    this.popElementIdMap = {};
+    this.darkElementList = [];
+    this.popElementStackList = [];
     this.focusDarkMap = {};
     this.lastPopIndex = 0;
     this.divCamSizeChecker;
+    //Close Pop By Key [ESC]
+    getEl(document).addEventListener('keydown', function(event){
+        var keyCode = (event.keyCode) ? event.keyCode : event.which;
+        if (keyCode == 27){ //[ESC] => Close Latest Index Pop
+            var latestIndex = that.popElementStackList.length -1;
+            var lastestIndexPopElement = that.popElementStackList[latestIndex];
+            var lastestIndexPop = that.getPop(lastestIndexPopElement);
+            // console.log(latestIndex, lastestIndexPopElement, lastestIndexPop, that.popElementStackList);
+            if (lastestIndexPop && lastestIndexPop.closebyesc)
+                that.close(lastestIndexPop.element);
+        }
+    });
+    //Automatically Adjust Pop
     getEl().ready(function(){
         getEl().resize(function(){
-            for (var name in that.popMap){
-                if (that.isOn(name))
-                    that.adjustPossition(name);
+            for (var popmanId in that.popMap){
+                var pop = that.getPopByManId(popmanId);
+                if (that.isOn(pop.element))
+                    that.adjustPossition(pop.element);
             }
         });
     });
     return this;
 }
 
-PopMan.prototype.detect= function(infoObj){
+/*************************
+ *
+ * DETECT DOM SETUPED WITH POPMAN OPTION
+ *
+ *************************/
+PopMan.prototype.detect= function(afterDetectFunc){
     var that = this;
     getEl().ready(function(){
-        var setedObjs = document.querySelectorAll('[data-pop]');
-        for (var j=0; j<setedObjs.length; j++){
-            var obj = setedObjs[j];
-            // if (obj.isAdaptedDarkPop) continue;
-            // obj.isAdaptedDarkPop = true;
-            var name = obj.getAttribute('data-pop');
-            that.add(name, obj);
+        var setupedElementList
+        /** 객체탐지 적용(팝창) **/
+        setupedElementList = document.querySelectorAll('[data-pop]');
+        for (var j=0; j<setupedElementList.length; j++){
+            that.add(setupedElementList[j]);
         }
+        /** Run Function After Detect **/
+        if (afterDetectFunc)
+            afterDetectFunc(that);
+        if (that.hasEventListenerByEventName('afterdetect'))
+            that.execEventListenerByEventName('afterdetect');
     });
     return this;
 };
+PopMan.prototype.afterDetect = function(func){
+    this.addEventListenerByEventName('afterdetect', func);
+    return this;
+};
 
-PopMan.prototype.add = function(infoObj){
-    var that = this;    
-    var name = infoObj.name;
-    // popView
+/*************************
+ *
+ * EVENT - ADD
+ *
+ *************************/
+PopMan.prototype.addEventListener               = function(element, eventName, eventFunc){ return this.event.addEventListener(element, eventName, eventFunc); };
+PopMan.prototype.addEventListenerByEventName    = function(eventName, eventFunc){ return this.event.addEventListenerByEventName(eventName, eventFunc); };
+
+/*************************
+ *
+ * EVENT - CHECK
+ *
+ *************************/
+PopMan.prototype.hasEventListener               = function(element, eventName, eventFunc){ return this.event.hasEventListener(element, eventName, eventFunc); };
+PopMan.prototype.hasEventListenerByEventName    = function(eventName, eventFunc){ return this.event.hasEventListenerByEventName(eventName, eventFunc); };
+PopMan.prototype.hasEventListenerByEventFunc    = function(eventFunc){ return this.event.hasEventListenerByEventFunc(eventFunc); };
+
+/*************************
+ *
+ * EVENT - REMOVE
+ *
+ *************************/
+PopMan.prototype.removeEventListener            = function(element, eventName, eventFunc){ return this.event.removeEventListener(element, eventName, eventFunc); };
+PopMan.prototype.removeEventListenerByEventName = function(eventName, eventFunc){ return this.event.removeEventListenerByEventName(eventName, eventFunc); };
+PopMan.prototype.removeEventListenerByEventFunc = function(eventFunc){ return this.event.removeEventListenerByEventFunc(eventFunc); };
+
+/*************************
+ *
+ * EVENT - EXECUTE
+ *
+ *************************/
+PopMan.prototype.execEventListener              = function(element, eventName, event){ return this.event.execEventListener(element, eventName, event); };
+PopMan.prototype.execEventListenerByEventName   = function(eventName, event){ return this.event.execEventListenerByEventName(eventName, event); };
+
+
+
+/*************************
+ *
+ * POP
+ *
+ *************************/
+PopMan.prototype.add = function(element){
+    //ElEMENT 속성에 data-pop이 없으면 자동 추가
+    if (element.getAttribute('data-pop') == null || element.getAttribute('data-pop') == undefined)
+        element.setAttribute('data-pop', '');
+
+    //ElEMENT 속성만 있고 값은 명시안할 경우 자동 명시
+    if (element.getAttribute('data-closebyclickin') != null && element.getAttribute('data-closebyclickin') != undefined && element.getAttribute('data-closebyclickin') == '')
+        element.setAttribute('data-closebyclickin', 'true');
+    if (element.getAttribute('data-closebyclickout') != null && element.getAttribute('data-closebyclickout') != undefined && element.getAttribute('data-closebyclickout') == '')
+        element.setAttribute('data-closebyclickout', 'true');
+    if (element.getAttribute('data-escclose') != null && element.getAttribute('data-escclose') != undefined && element.getAttribute('data-escclose') == '')
+        element.setAttribute('data-escclose', 'true');
+
+    this.set(element, {
+        element:    element,
+        expx:       element.getAttribute('data-expx'),
+        expy:       element.getAttribute('data-expy'),
+        closebyesc:     getData(element.getAttribute('data-escclose')).parse(),
+        closebyclickout: getData(element.getAttribute('data-closebyclickout')).parse(),
+        closebyclickin: getData(element.getAttribute('data-closebyclickin')).parse(),
+        pop:        element.getAttribute('data-pop'),
+        close:      element.getAttribute('data-close')
+    });
+};
+PopMan.prototype.new = function(infoObj){
+    var newElement = newEl('div', {'data-pop':'true'}, '');
+    this.set(newElement, infoObj);
+    return newElement;
+};
+PopMan.prototype.set = function(element, infoObj){
+    var that = this;
+    var popMap = this.popMap;
+    element = getEl(element).obj;
+    infoObj = (infoObj) ? infoObj : {};
+
+    //이중적용 방지
+    if (element.isAdaptedBox){
+        return false;
+    }else{
+        element.isAdaptedBox = true;
+        getEl(element).clas.add('sj-obj-box');
+    }
+
+    //MAN ID 적용
+    var popmanId = (infoObj.popmanId) ? infoObj.popmanId : getEl(popMap).getNewSeqId('popmanId');
+    element.popmanId = popmanId;
+
+    infoObj.element = element;
+    infoObj.darkElement = null;
+    infoObj.isPoped = false;
+
+    if (infoObj.closebyclickin == undefined || infoObj.closebyclickin == null)
+        infoObj.closebyclickin = false;
+
+    if (infoObj.closebyclickout == undefined || infoObj.closebyclickout == null)
+        infoObj.closebyclickout = true;
+
+    if (infoObj.closebyesc == undefined || infoObj.closebyesc == null)
+        infoObj.closebyesc = true;
+    //Set View
+    infoObj.popContainerElement = this.setView(infoObj);
+    //컬렉션에 저장
+    this.popMap[popmanId] = infoObj;
+    this.popElementIdMap[element.id] = infoObj;
+};
+
+PopMan.prototype.setView = function(infoObj){
+    var that = this;
     var popView = document.createElement('div');
-    // popView - Style
     popView.style.display = 'inline-block';
     popView.style.background = 'white';
     popView.style.width = (infoObj.width) ? infoObj.width : '100%';
@@ -50,74 +182,137 @@ PopMan.prototype.add = function(infoObj){
     popView.style.overflow = 'hidden';
     getEl(popView).hideDiv();
     // popView - Event
-    getEl(popView).addEventListener('click', function(event){
-        event.preventDefault();
-        event.stopPropagation();
-    });    
-    // popView -> body
-    getEl(document.body).add(popView);    
+    if (infoObj.closebyclickin){
+        getEl(popView).addEventListener('click', function(event){
+            event.preventDefault();
+            event.stopPropagation();
+            that.close(infoObj.element);
+        });
+    }else{
+        getEl(popView).addEventListener('click', function(event){
+            // event.preventDefault();
+            event.stopPropagation();
+        });
+    }
+
+    // body <- popView
+    getEl(document.body).add(popView);
     // popView <- Some Dom
-    var addObj = infoObj.add;
-    if (typeof addObj == 'function'){
-        addObj(infoObj);        
-    }else if (typeof addObj == 'object'){        
-        getEl(popView).add(addObj);
-        addObj.style.display = 'block';
-        // addObj.style.position = ''; 
+    var element = infoObj.element;
+    if (typeof element == 'function'){
+        getEl(popView).add( element(infoObj) );
+    }else if (typeof element == 'object'){
+        getEl(popView).add(element);
+        element.style.display = 'block';
+        // addObj.style.position = '';
         // addObj.style.left = '0px';
         // addObj.style.top = '0px';
-        addObj.style.width = '100%';
-        addObj.style.height = '100%';
+        element.style.width = '100%';
+        element.style.height = '100%';
     }
-    // Save
-    this.popMap[name] = infoObj;
-    this.popMap[name].popEl = popView;
-    this.popMap[name].darkEl = null;
-    this.popMap[name].isPoped = false;
-    return this;
+    return popView;
 };
 
-PopMan.prototype.isOn = function(name){
-    var pop = this.popMap[name];
+
+PopMan.prototype.getPop = function(element){
+    if (typeof element == 'string'){
+        return this.getPopById(element);
+    }else if (element instanceof Element){
+        return this.getPopByEl(element);
+    }else{
+        var resultList = this.getPopsByCondition(element);
+        if (resultList != null && resultList.length > 0)
+            return resultList[0];
+    }
+    return;
+};
+PopMan.prototype.getPopById = function(id){
+    return this.popElementIdMap[id];
+};
+PopMan.prototype.getPopByEl = function(el){
+    var popMap = this.popMap;
+    if (el && el.popmanId){
+        var popmanId = el.popmanId;
+        var popInfo = popMap[popmanId];
+        return popInfo;
+    }
+};
+PopMan.prototype.getPopByManId = function(manid){
+    return this.popMap[manid];
+};
+PopMan.prototype.getPops = function(){
+    return this.popMap;
+};
+PopMan.prototype.getPopsByCondition = function(condition){
+    var resultList = [];
+    var popMap = this.popMap;
+    for (var popmanId in popMap){
+        var popInfo = popMap[popmanId];
+        var result = getEl(popInfo).find(condition);
+        if (result)
+            resultList.push(result);
+    }
+    return resultList;
+};
+PopMan.prototype.getPopsByDomAttributeCondition = function(condition){
+    var resultList = [];
+    var popMap = this.popMap;
+    for (var popmanId in popMap){
+        var popInfo = popMap[popmanId];
+        var el = popInfo.element;
+        var result = getEl(el).findDomAttribute(condition);
+        if (result)
+            resultList.push(result);
+    }
+    return resultList;
+};
+
+
+
+
+PopMan.prototype.isOn = function(element){
+    var pop = this.getPop(element);
     return pop && pop.isPoped;
 };
 
-PopMan.prototype.toggle = function(name){
-    if (this.isOn(name))
-        this.close(name);
-    else
-        this.pop(name);
+PopMan.prototype.toggle = function(element){
+    (this.isOn(element)) ? this.close(element) : this.pop(element);
 };
 
-PopMan.prototype.pop = function(name, callback){    
-    var pop = this.popMap[name];
-    var userSetPopElement = pop.popEl.children[0];
+PopMan.prototype.pop = function(element, callback){
+    var pop = this.getPop(element);
+    var userSetPopElement = pop.element;
     userSetPopElement.popIndex = (++this.lastPopIndex);
     userSetPopElement.setAttribute('data-pop-index', userSetPopElement.popIndex);
     if (!pop.isPoped){
-        if (pop.pop)
-            pop.pop(pop);
+        if (this.hasEventListener(element, 'pop'))
+            this.execEventListener(element, 'pop');
         if (!pop.noDark){
-            pop.darkEl = this.spreadDark(pop);
-            getEl(pop.darkEl).add(pop.popEl);
+            pop.darkElement = this.spreadDark(pop);
+            getEl(pop.darkElement).add(pop.popContainerElement);
+            this.popElementStackList.push(userSetPopElement);
         }else{
-            getEl(document.body).add(pop.popEl);
+            getEl(document.body).add(pop.popContainerElement);
         }
-        this.adjustPossition(name);
+        this.adjustPossition(element);
         pop.isPoped = true;        
-        if (callback) callback();
+        if (callback)
+            callback(pop.element);
     }
 };
 
-PopMan.prototype.close = function(name, callback){    
-    var pop = this.popMap[name];
+PopMan.prototype.close = function(element, callback){
+    var pop = this.getPop(element);
     if (pop.isPoped){
-        if (pop.close)
-            pop.close(pop);
-        getEl(pop.popEl.parentNode).del(pop.popEl);
+        if (this.hasEventListener(element, 'close'))
+            this.execEventListener(element, 'close');
+        getEl(pop.popContainerElement.parentNode).del(pop.popContainerElement);
+        //Close DarkElement
         if (!pop.noDark)
-            this.closeDark(pop.darkEl);
+            this.closeDark(pop.darkElement);
+        //Close Status
         pop.isPoped = false;
+        this.removeStack(element);
         if (callback) callback();
     }
 };
@@ -138,10 +333,10 @@ PopMan.prototype.focusOn = function(el){
         var camW = this.getDivCamSizeChecker().offsetWidth;
         var camH = this.getDivCamSizeChecker().offsetHeight;
         this.focusDarkMap = {
-            up:     this.getDarkEl(0, 0, camW, y),
-            down:   this.getDarkEl(0, y + h, camW, camH),
-            left:   this.getDarkEl(0, y, x, y + h),
-            right:  this.getDarkEl(x + w, y, camW, y + h),
+            up:     this.getDarkElement(0, 0, camW, y),
+            down:   this.getDarkElement(0, y + h, camW, camH),
+            left:   this.getDarkElement(0, y, x, y + h),
+            right:  this.getDarkElement(x + w, y, camW, y + h),
             arrow:  this.getArrow(x -30, y -9, '>>>')
         };
         for (var darkElName in this.focusDarkMap){
@@ -185,45 +380,46 @@ PopMan.prototype.spreadDark = function(pop){
     var zIndex = getData().findHighestZIndex(['div']) + 1;
     var color = 'rgba(0,0,0,.7)';
     // dark
-    var darkEl = document.createElement('div');
-    this.darkList.push(darkEl);
-    if (pop.easyclose){
-        getEl(darkEl).addEventListener('click', function(event){
+    var darkElement = document.createElement('div');
+    this.darkElementList.push(darkElement);
+    // dark - event
+    if (pop.closebyclickout){
+        getEl(darkElement).addEventListener('click', function(event){
             event.preventDefault();
             event.stopPropagation();
-            that.close(pop.name);
+            that.close(pop.element);
         });
     }
-    getEl(darkEl).showDiv();
-    getEl(document.body).add(darkEl);
-    
-    darkEl.style.display = 'block';
-    darkEl.style.width = '100%';
-    darkEl.style.height = '100%';
-    darkEl.style.zIndex = zIndex;
+    getEl(darkElement).showDiv();
+    getEl(document.body).add(darkElement);
+    //dark - style
+    darkElement.style.display = 'block';
+    darkElement.style.width = '100%';
+    darkElement.style.height = '100%';
+    darkElement.style.zIndex = zIndex;
     try{
-        darkEl.style.background = color;
+        darkElement.style.background = color;
     }catch(e){
         if (color.indexOf('rgba') != -1){
             color = color.replace('rgba', 'rgb');
             var endIdx = color.lastIndexOf(',');
             color = color.substring(0, endIdx) +')';
         }
-        darkEl.style.background = color;
+        darkElement.style.background = color;
     }
-    return darkEl;
+    return darkElement;
 };
 
 
 
 
-PopMan.prototype.adjustPossition = function(name, callback){
-    var pop = this.popMap[name];
-    var popEl = pop.popEl;
-    var parentW = popEl.parentNode.offsetWidth;
-    var parentH = popEl.parentNode.offsetHeight;
+PopMan.prototype.adjustPossition = function(element, callback){
+    var pop = this.getPop(element);
+    var popContainerElement = pop.popContainerElement;
+    var parentW = popContainerElement.parentNode.offsetWidth;
+    var parentH = popContainerElement.parentNode.offsetHeight;
     parentH = (parentH == 0) ? this.getDivCamSizeChecker().offsetHeight : parentH;
-    popEl.style.position = 'absolute';
+    popContainerElement.style.position = 'absolute';
     // var ml = pop.marginLeft;
     // var mt = pop.marginTop;
     // var mr = pop.marginRight;
@@ -242,10 +438,10 @@ PopMan.prototype.adjustPossition = function(name, callback){
             result = num;
         return result;
     }   
-    popEl.style.left = nvlDan(xPopExpMap.pos, 'px');   
-    popEl.style.top = nvlDan(yPopExpMap.pos, 'px');
-    popEl.style.width = nvlDan(xPopExpMap.size, 'px');
-    popEl.style.height = nvlDan(yPopExpMap.size, 'px');
+    popContainerElement.style.left = nvlDan(xPopExpMap.pos, 'px');
+    popContainerElement.style.top = nvlDan(yPopExpMap.pos, 'px');
+    popContainerElement.style.width = nvlDan(xPopExpMap.size, 'px');
+    popContainerElement.style.height = nvlDan(yPopExpMap.size, 'px');
 };
 PopMan.prototype.getSolvedPopExpMap = function(parentSize, popexp){    
     var getSize = this.getSize;
@@ -323,39 +519,46 @@ PopMan.prototype.getSize = function(parentSize, num){
 
 
 
-PopMan.prototype.closeDark = function(darkEl){
-    var darkList = this.darkList;
-    for (var i=0; i<darkList.length; i++){
-        if (darkList[i] == darkEl){
-            darkList.splice(i, 1);
-            getEl(darkEl.parentNode).del(darkEl);
+PopMan.prototype.closeDark = function(darkElement){
+    var darkElementList = this.darkElementList;
+    for (var i=0; i<darkElementList.length; i++){
+        if (darkElementList[i] == darkElement){
+            darkElementList.splice(i, 1);
+            getEl(darkElement.parentNode).del(darkElement);
+        }
+    }
+};
+
+PopMan.prototype.removeStack = function(popElement){
+    var popElementStackList = this.popElementStackList;
+    for (var i=0; i<popElementStackList.length; i++){
+        if (popElementStackList[i] == popElement){
+            popElementStackList.splice(i, 1);
         }
     }
 };
 
 
-
-
-PopMan.prototype.getDarkEl = function getDarkEl(sx, sy, ex, ey){
+PopMan.prototype.getDarkElement = function(sx, sy, ex, ey){
     var zIndex = 50;
     var color = 'rgba(0,0,0,.7)';
-    var darkEl = document.createElement('div');
+    var darkElement = document.createElement('div');
     var dan = 'px';
     function noMinus(val){
         return (val >= 0) ? val :  0;
     }
-    darkEl.style.left = sx + dan;
-    darkEl.style.top = sy + dan;
-    darkEl.style.width = noMinus(ex - sx) + dan;
-    darkEl.style.height = noMinus(ey - sy) + dan;
-    darkEl.style.zIndex = zIndex;
-    darkEl.style.display = 'block';
-    darkEl.style.position = 'absolute';
-    darkEl.style.transition = "background-color .5s, transform .5s";
-    this.setBackgroundColor(darkEl, 'rgba(255,255,255,0)');
-    return darkEl;
+    darkElement.style.left = sx + dan;
+    darkElement.style.top = sy + dan;
+    darkElement.style.width = noMinus(ex - sx) + dan;
+    darkElement.style.height = noMinus(ey - sy) + dan;
+    darkElement.style.zIndex = zIndex;
+    darkElement.style.display = 'block';
+    darkElement.style.position = 'absolute';
+    darkElement.style.transition = "background-color .5s, transform .5s";
+    this.setBackgroundColor(darkElement, 'rgba(255,255,255,0)');
+    return darkElement;
 };
-PopMan.prototype.getArrow = function getDarkEl(sx, sy, comment){
+PopMan.prototype.getArrow = function(sx, sy, comment){
     var zIndex = 51;
     var color = 'rgba(0,0,0,.7)';
     var arrowEl = document.createElement('div');
@@ -375,7 +578,7 @@ PopMan.prototype.getArrow = function getDarkEl(sx, sy, comment){
     arrowEl.innerHTML = comment;
     return arrowEl;
 };
-PopMan.prototype.getBodyOffset = function (objTemp){
+PopMan.prototype.getBodyOffset = function(objTemp){
     var sumOffsetLeft = 0;
     var sumOffsetTop = 0;
     var thisObj = objTemp;
