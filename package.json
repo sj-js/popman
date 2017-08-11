@@ -7,8 +7,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/souljungkim/popman.git",
-    "web": "https://github.com/souljungkim/popman"
+    "url": "https://github.com/sj-js/popman.git",
+    "web": "https://github.com/sj-js/popman"
   },
   "devDependencies": {
     "gulp": "^3.9.0",

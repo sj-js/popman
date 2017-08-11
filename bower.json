@@ -5,7 +5,7 @@
   "authors": ["SJ <souljungkim@gmail.com>"],
   "license": "MIT",
   "keywords": ["popman", "pop", "no popup"],
-  "homepage": "https://github.com/souljungkim/popman",
+  "homepage": "https://github.com/sj-js/popman",
   "ignore": [
     "**/.*",
     "node_modules",
