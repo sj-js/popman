@@ -284,6 +284,7 @@ PopMan.prototype.pop = function(element, callback){
     var userSetPopElement = pop.element;
     userSetPopElement.popIndex = (++this.lastPopIndex);
     userSetPopElement.setAttribute('data-pop-index', userSetPopElement.popIndex);
+    //When pop is closed
     if (!pop.isPoped){
         if (this.hasEventListener(element, 'pop'))
             this.execEventListener(element, 'pop');
@@ -296,9 +297,9 @@ PopMan.prototype.pop = function(element, callback){
         }
         this.adjustPossition(element);
         pop.isPoped = true;        
-        if (callback)
-            callback(pop.element);
     }
+    if (callback)
+        callback(pop.element);
 };
 
 PopMan.prototype.close = function(element, callback){
@@ -312,8 +313,9 @@ PopMan.prototype.close = function(element, callback){
             this.closeDark(pop.darkElement);
         //Close Status
         pop.isPoped = false;
-        this.removeStack(element);
-        if (callback) callback();
+        this.removeStack(pop.element);
+        if (callback)
+            callback(pop.element);
     }
 };
 
