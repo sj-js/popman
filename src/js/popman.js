@@ -14,9 +14,10 @@ function PopMan(){
     this.lastPopIndex = 0;
     this.divCamSizeChecker;
     //Close Pop By Key [ESC]
-    getEl(document).addEventListener('keydown', function(event){
+    // getEl(document).addEventListener('keydown', function(event){
+    document.addEventListener('keydown', function(event){
         var keyCode = (event.keyCode) ? event.keyCode : event.which;
-        if (keyCode == 27){ //[ESC] => Close Latest Index Pop
+        if (keyCode == 27){ //[ESC] => Close - Latest Index Pop
             var latestIndex = that.popElementStackList.length -1;
             var lastestIndexPopElement = that.popElementStackList[latestIndex];
             var lastestIndexPop = that.getPop(lastestIndexPopElement);
@@ -24,19 +25,46 @@ function PopMan(){
             if (lastestIndexPop && lastestIndexPop.closebyesc)
                 that.close(lastestIndexPop.element);
         }
+        if (keyCode == 13){ //[ENTER] => OK - Latest Index Pop
+            var latestIndex = that.popElementStackList.length -1;
+            var lastestIndexPopElement = that.popElementStackList[latestIndex];
+            var lastestIndexPop = that.getPop(lastestIndexPopElement);
+            // console.log(latestIndex, lastestIndexPopElement, lastestIndexPop, that.popElementStackList);
+            if (lastestIndexPop && lastestIndexPop.okbyenter){
+                let result = that.ok(lastestIndexPop.element);
+                if (result)
+                    that.close(lastestIndexPop.element);
+            }
+
+        }
     });
     //Automatically Adjust Pop
-    getEl().ready(function(){
-        getEl().resize(function(){
-            for (var popmanId in that.popMap){
-                var pop = that.getPopByManId(popmanId);
-                if (that.isOn(pop.element))
-                    that.adjustPossition(pop.element);
-            }
+    // getEl().ready(function(){
+    //     // getEl().resize(function(){
+    //     //     for (var popmanId in that.popMap){
+    //     //         var pop = that.getPopByManId(popmanId);
+    //     //         if (that.isOn(pop.element))
+    //     //             that.adjustPossition(pop.element);
+    //     //     }
+    //     // });
+    // });
+
+    document.addEventListener("DOMContentLoaded", function(){
+        window.addEventListener('resize', function(){
+            that.resize();
         });
-    });
+    }, false);
+
     return this;
 }
+/*************************
+ * Exports
+ *************************/
+try{
+    module.exports = exports = PopMan;
+}catch(e){}
+
+
 
 /*************************
  *
@@ -46,7 +74,7 @@ function PopMan(){
 PopMan.prototype.detect= function(afterDetectFunc){
     var that = this;
     getEl().ready(function(){
-        var setupedElementList
+        var setupedElementList;
         /** 객체탐지 적용(팝창) **/
         setupedElementList = document.querySelectorAll('[data-pop]');
         for (var j=0; j<setupedElementList.length; j++){
@@ -64,6 +92,32 @@ PopMan.prototype.afterDetect = function(func){
     this.addEventListenerByEventName('afterdetect', func);
     return this;
 };
+PopMan.prototype.beforeFirstPop = function(func){
+    this.addEventListenerByEventName('beforefirstpop', func);
+    return this;
+};
+PopMan.prototype.afterLastPop = function(func){
+    this.addEventListenerByEventName('afterlastpop', func);
+    return this;
+};
+
+
+/*************************
+ * EVENT - RESIZE
+ *************************/
+PopMan.prototype.resize = function(){
+    let that = this;
+    // console.error('[popman] resize event! start');
+    for (var popmanId in that.popMap){
+        var pop = that.getPopByManId(popmanId);
+        if (that.isOn(pop.element))
+            that.adjustPossition(pop.element);
+    }
+    // console.error('[popman] resize event! finish');
+};
+
+
+
 
 /*************************
  *
@@ -118,11 +172,13 @@ PopMan.prototype.add = function(element){
         element.setAttribute('data-closebyclickout', 'true');
     if (element.getAttribute('data-escclose') != null && element.getAttribute('data-escclose') != undefined && element.getAttribute('data-escclose') == '')
         element.setAttribute('data-escclose', 'true');
-
+    if (element.getAttribute('data-enterok') != null && element.getAttribute('data-enterok') != undefined && element.getAttribute('data-enterok') == '')
+        element.setAttribute('data-enterok', 'true');
     this.set(element, {
         element:    element,
         expx:       element.getAttribute('data-expx'),
         expy:       element.getAttribute('data-expy'),
+        okbyenter:     getData(element.getAttribute('data-enterok')).parse(),
         closebyesc:     getData(element.getAttribute('data-escclose')).parse(),
         closebyclickout: getData(element.getAttribute('data-closebyclickout')).parse(),
         closebyclickin: getData(element.getAttribute('data-closebyclickin')).parse(),
@@ -152,7 +208,9 @@ PopMan.prototype.set = function(element, infoObj){
     //MAN ID 적용
     var popmanId = (infoObj.popmanId) ? infoObj.popmanId : getEl(popMap).getNewSeqId('popmanId');
     element.popmanId = popmanId;
-
+    element.id = popmanId;
+    infoObj.id = popmanId;
+    infoObj.popmanId = popmanId;
     infoObj.element = element;
     infoObj.darkElement = null;
     infoObj.isPoped = false;
@@ -165,21 +223,39 @@ PopMan.prototype.set = function(element, infoObj){
 
     if (infoObj.closebyesc == undefined || infoObj.closebyesc == null)
         infoObj.closebyesc = true;
+    if (infoObj.okbyenter == undefined || infoObj.okbyenter == null)
+        infoObj.okbyenter = true;
     //Set View
     infoObj.popContainerElement = this.setView(infoObj);
     //컬렉션에 저장
     this.popMap[popmanId] = infoObj;
     this.popElementIdMap[element.id] = infoObj;
+
+    //EVENT
+    if (infoObj.pop)
+        this.addEventListener(element, 'pop', infoObj.pop);
+    if (infoObj.afterpop)
+        this.addEventListener(element, 'afterpop', infoObj.afterpop);
+    if (infoObj.add)
+        this.addEventListener(element, 'add', infoObj.add);
+    if (infoObj.ok)
+        this.addEventListener(element, 'ok', infoObj.ok);
+    if (infoObj.close)
+        this.addEventListener(element, 'close', infoObj.close);
+    if (infoObj.afterclose)
+        this.addEventListener(element, 'afterclose', infoObj.afterclose);
+    infoObj.add(infoObj);
 };
 
 PopMan.prototype.setView = function(infoObj){
     var that = this;
     var popView = document.createElement('div');
     popView.style.display = 'inline-block';
-    popView.style.background = 'white';
+    // popView.style.background = 'white';
     popView.style.width = (infoObj.width) ? infoObj.width : '100%';
     popView.style.height = (infoObj.height) ? infoObj.height : '100%';
-    popView.style.overflow = 'hidden';
+    // popView.style.overflow = 'hidden';
+    popView.style.overflow = 'auto';
     getEl(popView).hideDiv();
     // popView - Event
     if (infoObj.closebyclickin){
@@ -211,6 +287,15 @@ PopMan.prototype.setView = function(infoObj){
         element.style.height = '100%';
     }
     return popView;
+};
+PopMan.prototype.removePop = function(popObject){
+    let element = popObject.element;
+    delete this.popMap[popObject.id];
+    this.removeEventListener(element, 'pop');
+    this.removeEventListener(element, 'afterpop');
+    this.removeEventListener(element, 'add');
+    this.removeEventListener(element, 'close');
+    this.removeEventListener(element, 'afterclose');
 };
 
 
@@ -281,43 +366,261 @@ PopMan.prototype.toggle = function(element){
 
 PopMan.prototype.pop = function(element, callback){
     var pop = this.getPop(element);
+    element = pop.element;
     var userSetPopElement = pop.element;
     userSetPopElement.popIndex = (++this.lastPopIndex);
     userSetPopElement.setAttribute('data-pop-index', userSetPopElement.popIndex);
     //When pop is closed
     if (!pop.isPoped){
         if (this.hasEventListener(element, 'pop'))
-            this.execEventListener(element, 'pop');
+            this.execEventListener(element, 'pop', pop);
         if (!pop.noDark){
             pop.darkElement = this.spreadDark(pop);
             getEl(pop.darkElement).add(pop.popContainerElement);
-            this.popElementStackList.push(userSetPopElement);
+            this.pushStack(userSetPopElement);
         }else{
             getEl(document.body).add(pop.popContainerElement);
         }
         this.adjustPossition(element);
-        pop.isPoped = true;        
+        pop.isPoped = true;
+        if (this.hasEventListener(element, 'afterpop'))
+            this.execEventListener(element, 'afterpop', pop);
     }
     if (callback)
         callback(pop.element);
 };
 
+PopMan.prototype.ok = function(element, callback){
+    let result = false;
+    var pop = this.getPop(element);
+    element = pop.element;
+    if (pop.isPoped){
+        if (this.hasEventListener(element, 'ok'))
+            result = this.execEventListener(element, 'ok', pop);
+    }
+    return result;
+};
 PopMan.prototype.close = function(element, callback){
     var pop = this.getPop(element);
+    element = pop.element;
     if (pop.isPoped){
         if (this.hasEventListener(element, 'close'))
-            this.execEventListener(element, 'close');
+            this.execEventListener(element, 'close', pop);
         getEl(pop.popContainerElement.parentNode).del(pop.popContainerElement);
         //Close DarkElement
         if (!pop.noDark)
             this.closeDark(pop.darkElement);
         //Close Status
         pop.isPoped = false;
+        if (this.hasEventListener(element, 'afterclose'))
+            this.execEventListener(element, 'afterclose', pop);
         this.removeStack(pop.element);
         if (callback)
             callback(pop.element);
     }
 };
+
+
+
+
+/**************************************************
+ * Temporary New Pop Instance to Confirm  (like alert('hello?');)
+ * @param callbackForOk
+ * @param callbackForCancel
+ **************************************************/
+PopMan.prototype.alert = function(content, callbackForOk){
+    let that = this;
+    let elementForPopAlert = this.new({
+        expx:'500',
+        expy:'300',
+        easyclose:true,
+        pop: function(data){
+        },
+        add:function(data){
+            let popElement = data.element;
+            data.okbyenter = true;
+            that.addEventListener(data.element, 'ok', function(pop){
+                if (callbackForOk && !callbackForOk(pop))
+                    return false;
+                return true;
+            });
+            let divContextAlert = getEl(newEl('div')).addClass('sj-popman-obj-context-alert').returnElement();
+            divContextAlert.style.display = 'block';
+            divContextAlert.style.width = '100%';
+            divContextAlert.style.height = '100%';
+            divContextAlert.style.textAlign = 'center';
+            let divContentBox = getEl(newEl('div')).addClass('sj-popman-obj-box-content').appendTo(divContextAlert).returnElement();
+            divContentBox.style.display = 'block';
+            divContentBox.style.width = '100%';
+            divContentBox.style.textAlign = 'center';
+            let btnForOk = getEl(newEl('button')).addClass('sj-popman-obj-btn-alert').appendTo(divContextAlert).returnElement();
+            btnForOk.style.display = 'inline-block';
+            btnForOk.innerHTML = 'O';
+            btnForOk.addEventListener('click', function(){
+                if (callbackForOk && !callbackForOk())
+                    return;
+                that.close(popElement);
+            });
+            //User Set Content
+            popElement.innerHTML = '';
+            if (typeof content == 'object'){
+                divContentBox.appendChild(content);
+            }else{
+                divContentBox.innerHTML = content;
+            }
+            popElement.appendChild(divContextAlert);
+        },
+        afterpop:function(data){
+        },
+        close:function(data){
+        },
+        afterclose:function(data){
+            that.removePop(data);
+        }
+    });
+    this.add(elementForPopAlert);
+    this.pop(elementForPopAlert);
+    return elementForPopAlert;
+};
+
+/**************************************************
+ * Temporary New Pop Instance to Confirm  (like confirm('hello?');)
+ * @param callbackForOk
+ * @param callbackForCancel
+ **************************************************/
+PopMan.prototype.confirm = function(content, callbackForOk, callbackForCancel){
+    let that = this;
+    let elementForPopConfirm = this.new({
+        expx:'500',
+        expy:'300',
+        easyclose:true,
+        pop: function(data){
+        },
+        add:function(data){
+            let popElement = data.element;
+            data.okbyenter = true;
+            that.addEventListener(data.element, 'ok', function(pop){
+                if (callbackForOk && !callbackForOk(pop))
+                    return false;
+                return true;
+            });
+            let divContextConfirm = getEl(newEl('div')).addClass('sj-popman-obj-context-confirm').returnElement();
+            divContextConfirm.style.display = 'block';
+            divContextConfirm.style.width = '100%';
+            divContextConfirm.style.height = '100%';
+            divContextConfirm.style.textAlign = 'center';
+            let divContentBox = getEl(newEl('div')).addClass('sj-popman-obj-box-content').appendTo(divContextConfirm).returnElement();
+            divContentBox.style.display = 'block';
+            divContentBox.style.width = '100%';
+            divContentBox.style.textAlign = 'center';
+            let btnForOk = getEl(newEl('button')).addClass('sj-popman-obj-btn-confirm').appendTo(divContextConfirm).returnElement();
+            btnForOk.style.display = 'inline-block';
+            btnForOk.innerHTML = 'O';
+            btnForOk.addEventListener('click', function(){
+                if (callbackForOk && !callbackForOk())
+                    return;
+                that.close(popElement);
+            });
+            let btnForCancel = getEl(newEl('button')).addClass('sj-popman-obj-btn-cancel').appendTo(divContextConfirm).returnElement();
+            btnForCancel.style.display = 'inline-block';
+            btnForCancel.innerHTML = 'X';
+            btnForCancel.addEventListener('click', function(){
+                if (callbackForCancel && !callbackForCancel())
+                    return;
+                that.close(popElement);
+            });
+            //User Set Content
+            popElement.innerHTML = '';
+            if (typeof content == 'object'){
+                divContentBox.appendChild(content);
+            }else{
+                divContentBox.innerHTML = content;
+            }
+            popElement.appendChild(divContextConfirm);
+        },
+        afterpop:function(data){
+        },
+        close:function(data){
+        },
+        afterclose:function(data){
+            that.removePop(data);
+        }
+    });
+    this.add(elementForPopConfirm);
+    this.pop(elementForPopConfirm);
+    return elementForPopConfirm;
+};
+
+/**************************************************
+ * Temporary New Pop Instance to Confirm  (like alert('hello?');)
+ * @param callbackForOk
+ * @param callbackForCancel
+ **************************************************/
+PopMan.prototype.loading = function(content, callbackForPromise){
+    let that = this;
+    let elementForPopLoading = this.new({
+        expx:'500',
+        expy:'300',
+        easyclose:true,
+        pop: function(data){
+        },
+        add:function(data){
+            let popElement = data.element;
+            data.okbyenter = true;
+            that.addEventListener(data.element, 'ok', function(pop){
+                if (callbackForOk && !callbackForOk(pop))
+                    return false;
+                return true;
+            });
+            let divContextAlert = getEl(newEl('div')).addClass('sj-popman-obj-context-alert').returnElement();
+            divContextAlert.style.display = 'block';
+            divContextAlert.style.width = '100%';
+            divContextAlert.style.height = '100%';
+            divContextAlert.style.textAlign = 'center';
+            let divContentBox = getEl(newEl('div')).addClass('sj-popman-obj-box-content').appendTo(divContextAlert).returnElement();
+            divContentBox.style.display = 'block';
+            divContentBox.style.width = '100%';
+            divContentBox.style.textAlign = 'center';
+            let btnForOk = getEl(newEl('button')).addClass('sj-popman-obj-btn-alert').appendTo(divContextAlert).returnElement();
+            btnForOk.style.display = 'inline-block';
+            btnForOk.innerHTML = 'O';
+            btnForOk.addEventListener('click', function(){
+                if (callbackForOk && !callbackForOk())
+                    return;
+                that.close(popElement);
+            });
+            //User Set Content
+            popElement.innerHTML = '';
+            if (typeof content == 'object'){
+                divContentBox.appendChild(content);
+            }else{
+                divContentBox.innerHTML = content;
+            }
+            popElement.appendChild(divContextAlert);
+        },
+        afterpop:function(data){
+        },
+        close:function(data){
+        },
+        afterclose:function(data){
+            that.removePop(data);
+        }
+    });
+    this.add(elementForPopLoading);
+    this.pop(elementForPopLoading);
+    let promise = new Promise(function(resolve, reject){
+        callbackForPromise(resolve, reject);
+    }).then(function(value){
+        that.close(elementForPopLoading);
+    }).catch(function(error){
+        alert(error);
+        that.close(elementForPopLoading);
+    });
+    return promise;
+};
+
+
+
 
 PopMan.prototype.focusOn = function(el){
     if (!this.focusDarkMap.up && el){
@@ -395,6 +698,7 @@ PopMan.prototype.spreadDark = function(pop){
     getEl(darkElement).showDiv();
     getEl(document.body).add(darkElement);
     //dark - style
+    getEl(darkElement).clas.add('sj-popman-obj-dark');
     darkElement.style.display = 'block';
     darkElement.style.width = '100%';
     darkElement.style.height = '100%';
@@ -422,6 +726,7 @@ PopMan.prototype.adjustPossition = function(element, callback){
     var parentH = popContainerElement.parentNode.offsetHeight;
     parentH = (parentH == 0) ? this.getDivCamSizeChecker().offsetHeight : parentH;
     popContainerElement.style.position = 'absolute';
+    getEl(popContainerElement).clas.add('sj-popman-obj-container');
     // var ml = pop.marginLeft;
     // var mt = pop.marginTop;
     // var mr = pop.marginRight;
@@ -531,12 +836,22 @@ PopMan.prototype.closeDark = function(darkElement){
     }
 };
 
+
+PopMan.prototype.pushStack = function(popElement){
+    this.popElementStackList.push(popElement);
+    if (this.popElementStackList.length == 1){
+        this.execEventListenerByEventName('beforefirstpop');
+    }
+};
 PopMan.prototype.removeStack = function(popElement){
     var popElementStackList = this.popElementStackList;
-    for (var i=0; i<popElementStackList.length; i++){
+    for (var i=popElementStackList.length -1; i>-1; i--){
         if (popElementStackList[i] == popElement){
             popElementStackList.splice(i, 1);
         }
+    }
+    if (this.popElementStackList.length == 0){
+        this.execEventListenerByEventName('afterlastpop');
     }
 };
 
