@@ -56,6 +56,7 @@ function PopMan(options){
 
         }
     });
+
     //Automatically Adjust Pop
     // getEl().ready(function(){
     //     // getEl().resize(function(){
@@ -67,11 +68,15 @@ function PopMan(options){
     //     // });
     // });
 
+    window.addEventListener('resize', function(){
+        that.resize();
+    });
+
     document.addEventListener("DOMContentLoaded", function(){
-        window.addEventListener('resize', function(){
-            that.resize();
-        });
+        that.resize();
     }, false);
+
+
 
     return this;
 }
@@ -137,13 +142,12 @@ PopMan.prototype.afterLastPop = function(func){
  *************************/
 PopMan.prototype.resize = function(){
     var that = this;
-    // console.error('[popman] resize event! start');
     for (var popmanId in that.popMap){
         var pop = that.getPopByManId(popmanId);
         if (that.isOn(pop.element))
             that.adjustPossition(pop.element);
     }
-    // console.error('[popman] resize event! finish');
+    console.log('[POPMAN] RESIZE>>  resize event!');
 };
 
 
@@ -312,7 +316,14 @@ PopMan.prototype.setView = function(infoObj){
     popView.style.height = (infoObj.height) ? infoObj.height : '100%';
     // popView.style.overflow = 'hidden';
     popView.style.overflow = 'auto';
+
+    //Hide Div
     getEl(popView).hideDiv();
+    // popView.style.display = 'block';
+    // popView.style.position = 'absolute';
+    // popView.style.left = '-5555px';
+    // popView.style.top = '-5555px';
+
     // popView - Event
     if (infoObj.closebyclickin){
         getEl(popView).addEventListener('click', function(event){
@@ -778,7 +789,14 @@ PopMan.prototype.spreadDark = function(pop){
             that.close(pop.element);
         });
     }
-    getEl(darkElement).showDiv();
+
+    //Show Div
+    // getEl(darkElement).showDiv();
+    darkElement.style.display = 'block';
+    darkElement.style.position = 'fixed';
+    darkElement.style.left = '0px';
+    darkElement.style.top = '0px';
+
     getEl(document.body).add(darkElement);
     //dark - style
     getEl(darkElement).clas.add('sj-popman-obj-dark');
@@ -808,7 +826,7 @@ PopMan.prototype.adjustPossition = function(element, callback){
     var parentW = popContainerElement.parentNode.offsetWidth;
     var parentH = popContainerElement.parentNode.offsetHeight;
     parentH = (parentH == 0) ? this.getDivCamSizeChecker().offsetHeight : parentH;
-    popContainerElement.style.position = 'absolute';
+    popContainerElement.style.position = 'fixed';
     getEl(popContainerElement).clas.add('sj-popman-obj-container');
     // var ml = pop.marginLeft;
     // var mt = pop.marginTop;
@@ -953,7 +971,7 @@ PopMan.prototype.getDarkElement = function(sx, sy, ex, ey){
     darkElement.style.height = noMinus(ey - sy) + dan;
     darkElement.style.zIndex = zIndex;
     darkElement.style.display = 'block';
-    darkElement.style.position = 'absolute';
+    darkElement.style.position = 'fixed';
     darkElement.style.transition = "background-color .5s, transform .5s";
     this.setBackgroundColor(darkElement, 'rgba(255,255,255,0)');
     return darkElement;
