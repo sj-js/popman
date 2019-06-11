@@ -1,0 +1,25 @@
+language: node_js
+node_js: 11.10.0
+os:
+- linux
+before_script:
+- npm install -g gulp
+script: gulp
+
+cache:
+  directories:
+    - "node_modules"
+
+before_deploy:
+  - pwd
+  - ls dist/js/
+  
+deploy:
+  provider: releases
+  api_key:
+    secure: "JIdKCs1Qe6Uf7afRfK4DVZvqEIeWDDskZAvqFAdRfa7zTHpEdcOnEXcC57RaQBgGN2mmhVWnbeSqz/mwz7/XS7+Il3U4PERBDdwAcaqKJ6l9hqcv5c+yAmB1XjDTzy4PuEq+dxskgsjK+QemzM22Q96g7aiiswEfrWOfN0vDX12S+bwHG2WTRTJxBQyitvyRk2fZuiK1Kfz5KxEBKplGQvRi6jYIIq3pmSSAn93QxN7XFuDvN2e2M6WX1DkzqFLfj8tShqObzq06LRz68TQ+cutesnhObafmlwjR2iRgZyojPNcylmt8qE5v2r8Tp5KfmngqGW8uIDT8G/g/218cBoDBXU9z/VUiurrq4DIEmJGwP9lhAGwtfIceCaCFBk2RoYbi06ojU8SvF6JnywYv1WtsqLYNa1s2plXPa5rElFmUuq8GuYQofvZZ6R6eefNMAb7cnt4Co3fUhwtlvLsNv4nKwW3z3eRlbgJZio4mGwi5DAaJ5x67CToiyFc2WX2yrtNnauqiPFYYGjl+LKVy2d5Nv7k1N2dTXKqmJfzCLEEmprZokSBuiNvQuImnOkbgkIpa4SB4rWAz75XVzeA73IiDV8lKaNCRfzXd3KaGi2o3x1OqzvG/hD7VkXNI5bnqGbEHeGDiUxCt9GSXoHwImrvLOWwx93c7lWeGyHSKaJg="
+  file: dist/js/popman.min.js
+  skip_cleanup: true
+  on:
+    repo: sj-js/popman
+    branch: master
