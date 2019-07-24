@@ -15,18 +15,30 @@ function PopMan(options){
     this.divCamSizeChecker;
 
     /** Mode **/
+    this.meta = {
+        nowEscControlPop: null,
+        nowEnterControlPop: null,
+        nowClickControlPop: null,
+    };
+    this.modeSleep = false;
     this.globalSetup = {
         modeTest: false,
         testPopClass: null,
         testPopBorderWidth: '1px',
         testPopBorderColor: '#39ff3e',
         testPopBackground: '#c0ffc9',
+        alertExp: null,
         alertExpx: '300',
         alertExpy: '200',
+        alertContent: null,
+        confirmExp: null,
         confirmExpx: '400',
         confirmExpy: '300',
+        confirmContent: null,
+        loadingExp: null,
         loadingExpx: '200',
         loadingExpy: '200',
+        loadingContent: null,
     };
     if (options)
         this.setup(options);
@@ -41,14 +53,37 @@ function PopMan(options){
             var lastestIndexPop = that.getPop(lastestIndexPopElement);
             // console.log(latestIndex, lastestIndexPopElement, lastestIndexPop, that.popElementStackList);
             if (lastestIndexPop && lastestIndexPop.closebyesc)
-                that.close(lastestIndexPop.element);
+                that.meta.nowEscControlPop = lastestIndexPop;
         }
         if (keyCode == 13){ //[ENTER] => OK - Latest Index Pop
             var latestIndex = that.popElementStackList.length -1;
             var lastestIndexPopElement = that.popElementStackList[latestIndex];
             var lastestIndexPop = that.getPop(lastestIndexPopElement);
             // console.log(latestIndex, lastestIndexPopElement, lastestIndexPop, that.popElementStackList);
-            if (lastestIndexPop && lastestIndexPop.okbyenter){
+            if (lastestIndexPop && lastestIndexPop.okbyenter)
+                that.meta.nowEnterControlPop = lastestIndexPop;
+        }
+    });
+
+    document.addEventListener('keyup', function(event){
+        var keyCode = (event.keyCode) ? event.keyCode : event.which;
+        if (keyCode == 27){ //[ESC] => Close - Latest Index Pop
+            var latestIndex = that.popElementStackList.length -1;
+            var lastestIndexPopElement = that.popElementStackList[latestIndex];
+            var lastestIndexPop = that.getPop(lastestIndexPopElement);
+            // console.log(latestIndex, lastestIndexPopElement, lastestIndexPop, that.popElementStackList);
+            if (lastestIndexPop && lastestIndexPop.closebyesc && that.meta.nowEscControlPop === lastestIndexPop){
+                that.meta.nowEscControlPop = null;
+                that.close(lastestIndexPop.element);
+            }
+        }
+        if (keyCode == 13){ //[ENTER] => OK - Latest Index Pop
+            var latestIndex = that.popElementStackList.length -1;
+            var lastestIndexPopElement = that.popElementStackList[latestIndex];
+            var lastestIndexPop = that.getPop(lastestIndexPopElement);
+            // console.log(latestIndex, lastestIndexPopElement, lastestIndexPop, that.popElementStackList);
+            if (lastestIndexPop && lastestIndexPop.okbyenter && that.meta.nowEnterControlPop === lastestIndexPop){
+                that.meta.nowEnterControlPop = null;
                 var result = that.ok(lastestIndexPop.element);
                 if (result)
                     that.close(lastestIndexPop.element);
@@ -147,7 +182,7 @@ PopMan.prototype.resize = function(){
         if (that.isOn(pop.element))
             that.adjustPossition(pop.element);
     }
-    console.log('[POPMAN] RESIZE>>  resize event!');
+    // console.log('[POPMAN] RESIZE>>  resize event!');
 };
 
 
@@ -200,27 +235,28 @@ PopMan.prototype.add = function(element){
         element.setAttribute('data-pop', '');
 
     //ElEMENT 속성만 있고 값은 명시안할 경우 자동 명시
-        if (element.getAttribute('data-closebyclickin') != null && element.getAttribute('data-closebyclickin') != undefined && element.getAttribute('data-closebyclickin') == '')
+    if (element.getAttribute('data-closebyclickin') != null && element.getAttribute('data-closebyclickin') != undefined && element.getAttribute('data-closebyclickin') == '')
         element.setAttribute('data-closebyclickin', 'true');
     if (element.getAttribute('data-closebyclickout') != null && element.getAttribute('data-closebyclickout') != undefined && element.getAttribute('data-closebyclickout') == '')
         element.setAttribute('data-closebyclickout', 'true');
-    if (element.getAttribute('data-escclose') != null && element.getAttribute('data-escclose') != undefined && element.getAttribute('data-escclose') == '')
-        element.setAttribute('data-escclose', 'true');
+    if (element.getAttribute('data-closebyesc') != null && element.getAttribute('data-closebyesc') != undefined && element.getAttribute('data-closebyesc') == '')
+        element.setAttribute('data-closebyesc', 'true');
     if (element.getAttribute('data-enterok') != null && element.getAttribute('data-enterok') != undefined && element.getAttribute('data-enterok') == '')
         element.setAttribute('data-enterok', 'true');
+
     this.set(element, {
-        element:    element,
-        expx:       element.getAttribute('data-expx'),
-        expy:       element.getAttribute('data-expy'),
-        okbyenter:     getData(element.getAttribute('data-enterok')).parse(),
-        closebyesc:     getData(element.getAttribute('data-escclose')).parse(),
-        closebyclickout: getData(element.getAttribute('data-closebyclickout')).parse(),
-        closebyclickin: getData(element.getAttribute('data-closebyclickin')).parse(),
-        add: element.getAttribute('data-add'),
-        pop: element.getAttribute('data-pop'),
-        afterpop: element.getAttribute('data-afterpop'),
-        close: element.getAttribute('data-close'),
-        afterclose: element.getAttribute('data-afterclose'),
+        element:            element,
+        expx:               element.getAttribute('data-expx'),
+        expy:               element.getAttribute('data-expy'),
+        okbyenter:          getData(element.getAttribute('data-enterok')).parse(),
+        closebyesc:         getData(element.getAttribute('data-closebyesc')).parse(),
+        closebyclickout:    getData(element.getAttribute('data-closebyclickout')).parse(),
+        closebyclickin:     getData(element.getAttribute('data-closebyclickin')).parse(),
+        add:                element.getAttribute('data-add'),
+        pop:                element.getAttribute('data-pop'),
+        afterpop:           element.getAttribute('data-afterpop'),
+        close:              element.getAttribute('data-close'),
+        afterclose:         element.getAttribute('data-afterclose'),
     });
 };
 PopMan.prototype.new = function(infoObj){
@@ -336,6 +372,10 @@ PopMan.prototype.setView = function(infoObj){
             // event.preventDefault();
             event.stopPropagation();
         });
+        getEl(popView).addEventListener('mousedown', function(event){
+            // event.preventDefault();
+            event.stopPropagation();
+        });
     }
 
     // body <- popView
@@ -379,9 +419,11 @@ PopMan.prototype.setTestView = function(infoObj, globalSetup){
 
 
 
-PopMan.prototype.removePop = function(popObject){
-    var element = popObject.element;
-    delete this.popMap[popObject.id];
+PopMan.prototype.removePop = function(element){
+    var pop = this.getPop(element);
+    element = pop.element;
+    delete this.popMap[pop.id];
+    delete this.popElementIdMap[pop.id];
     this.removeEventListener(element, 'pop');
     this.removeEventListener(element, 'afterpop');
     this.removeEventListener(element, 'add');
@@ -444,7 +486,10 @@ PopMan.prototype.getPopsByDomAttributeCondition = function(condition){
 };
 
 
-
+PopMan.prototype.has = function(element){
+    var pop = this.getPop(element);
+    return !!pop;
+};
 
 PopMan.prototype.isOn = function(element){
     var pop = this.getPop(element);
@@ -455,7 +500,10 @@ PopMan.prototype.toggle = function(element){
     (this.isOn(element)) ? this.close(element) : this.pop(element);
 };
 
-PopMan.prototype.pop = function(element, callback){
+PopMan.prototype.pop = function(element, callback, force){
+    if (this.modeSleep && !force)
+        return false;
+
     var pop = this.getPop(element);
     element = pop.element;
     var userSetPopElement = pop.element;
@@ -513,6 +561,16 @@ PopMan.prototype.close = function(element, callback){
 
 
 
+PopMan.prototype.sleep = function(){
+    this.modeSleep = true;
+};
+PopMan.prototype.active = function(){
+    this.modeSleep = false;
+};
+
+
+
+
 
 /**************************************************
  * Temporary New Pop Instance to Confirm  (like alert('hello?');)
@@ -522,6 +580,7 @@ PopMan.prototype.close = function(element, callback){
 PopMan.prototype.alert = function(content, callbackForOk){
     var that = this;
     var elementForPopAlert = this.new({
+        exp: that.globalSetup.alertExp,
         expx: that.globalSetup.alertExpx,
         expy: that.globalSetup.alertExpy,
         closebyclickout:true,
@@ -530,6 +589,10 @@ PopMan.prototype.alert = function(content, callbackForOk){
         },
         add:function(data){
             var popElement = data.element;
+
+            if (!content && that.globalSetup.alertContent)
+                content = that.globalSetup.alertContent;
+
             data.okbyenter = true;
             that.addEventListener(data.element, 'ok', function(pop){
                 if (callbackForOk && !callbackForOk(pop))
@@ -567,11 +630,11 @@ PopMan.prototype.alert = function(content, callbackForOk){
         close:function(data){
         },
         afterclose:function(data){
-            that.removePop(data);
+            that.removePop(data.element);
         }
     });
     this.add(elementForPopAlert);
-    this.pop(elementForPopAlert);
+    this.pop(elementForPopAlert, null, true);
     return elementForPopAlert;
 };
 
@@ -583,6 +646,7 @@ PopMan.prototype.alert = function(content, callbackForOk){
 PopMan.prototype.confirm = function(content, callbackForOk, callbackForCancel){
     var that = this;
     var elementForPopConfirm = this.new({
+        exp: that.globalSetup.confirmExp,
         expx: that.globalSetup.confirmExpx,
         expy: that.globalSetup.confirmExpy,
         closebyclickout:true,
@@ -591,6 +655,10 @@ PopMan.prototype.confirm = function(content, callbackForOk, callbackForCancel){
         },
         add:function(data){
             var popElement = data.element;
+
+            if (!content && that.globalSetup.confirmContent)
+                content = that.globalSetup.confirmContent;
+
             data.okbyenter = true;
             that.addEventListener(data.element, 'ok', function(pop){
                 if (callbackForOk && !callbackForOk(pop))
@@ -636,11 +704,11 @@ PopMan.prototype.confirm = function(content, callbackForOk, callbackForCancel){
         close:function(data){
         },
         afterclose:function(data){
-            that.removePop(data);
+            that.removePop(data.element);
         }
     });
     this.add(elementForPopConfirm);
-    this.pop(elementForPopConfirm);
+    this.pop(elementForPopConfirm, null, true);
     return elementForPopConfirm;
 };
 
@@ -652,56 +720,43 @@ PopMan.prototype.confirm = function(content, callbackForOk, callbackForCancel){
 PopMan.prototype.loading = function(content, callbackForPromise){
     var that = this;
     var elementForPopLoading = this.new({
+        exp: that.globalSetup.loadingExp,
         expx: that.globalSetup.loadingExpx,
         expy: that.globalSetup.loadingExpy,
+        // content: that.globalSetup.loadingContent,
         closebyclickout:false,
         closebyesc:false,
         pop: function(data){
         },
         add:function(data){
             var popElement = data.element;
-            // data.okbyenter = true;
-            // that.addEventListener(data.element, 'ok', function(pop){
-            //     if (callbackForOk && !callbackForOk(pop))
-            //         return false;
-            //     return true;
-            // });
-            var divContextAlert = getEl(newEl('div')).addClass('sj-popman-obj-context-alert').returnElement();
-            divContextAlert.style.display = 'block';
-            divContextAlert.style.width = '100%';
-            divContextAlert.style.height = '100%';
-            divContextAlert.style.textAlign = 'center';
-            var divContentBox = getEl(newEl('div')).addClass('sj-popman-obj-box-content').appendTo(divContextAlert).returnElement();
-            divContentBox.style.display = 'block';
-            divContentBox.style.width = '100%';
-            divContentBox.style.textAlign = 'center';
-            // var btnForOk = getEl(newEl('button')).addClass('sj-popman-obj-btn-alert').appendTo(divContextAlert).returnElement();
-            // btnForOk.style.display = 'inline-block';
-            // btnForOk.innerHTML = 'O';
-            // btnForOk.addEventListener('click', function(){
-            //     if (callbackForOk && !callbackForOk())
-            //         return;
-            //     that.close(popElement);
-            // });
+
+            if (!content && that.globalSetup.loadingContent)
+                content = that.globalSetup.loadingContent;
+
             //User Set Content
-            popElement.innerHTML = '';
-            if (typeof content == 'object'){
-                divContentBox.appendChild(content);
-            }else{
-                divContentBox.innerHTML = content;
+            if (content){
+                getEl(popElement.parentNode)
+                    .removeClass('sj-popman-obj-context-pop')
+                    .addClass('sj-popman-obj-context-loading');
+                var divContentBox = getEl(newEl('div'))
+                    .addClass('sj-popman-obj-box-content')
+                    .style('display:block; width:100%; height:100%; text-align:center')
+                    .add(content)
+                    .returnElement();
+                getEl(popElement).html('').add(divContentBox);
             }
-            popElement.appendChild(divContextAlert);
         },
         afterpop:function(data){
         },
         close:function(data){
         },
         afterclose:function(data){
-            that.removePop(data);
+            that.removePop(data.element);
         }
     });
     this.add(elementForPopLoading);
-    this.pop(elementForPopLoading);
+    this.pop(elementForPopLoading, null, true);
     var promise = new Promise(function(resolve, reject){
         callbackForPromise(resolve, reject);
     }).then(function(value){
@@ -783,10 +838,19 @@ PopMan.prototype.spreadDark = function(pop){
     this.darkElementList.push(darkElement);
     // dark - event
     if (pop.closebyclickout){
-        getEl(darkElement).addEventListener('click', function(event){
+        getEl(darkElement).addEventListener('mousedown', function(event){
             event.preventDefault();
             event.stopPropagation();
-            that.close(pop.element);
+            // that.close(pop.element);
+            that.meta.nowClickControlPop = pop;
+        });
+        getEl(darkElement).addEventListener('mouseup', function(event){
+            event.preventDefault();
+            event.stopPropagation();
+            if (that.meta.nowClickControlPop === pop){
+                that.meta.nowClickControlPop = null;
+                that.close(pop.element);
+            }
         });
     }
 
@@ -826,8 +890,13 @@ PopMan.prototype.adjustPossition = function(element, callback){
     var parentW = popContainerElement.parentNode.offsetWidth;
     var parentH = popContainerElement.parentNode.offsetHeight;
     parentH = (parentH == 0) ? this.getDivCamSizeChecker().offsetHeight : parentH;
-    popContainerElement.style.position = 'fixed';
-    getEl(popContainerElement).clas.add('sj-popman-obj-container');
+    getEl(popContainerElement)
+        .addStyle('position', 'fixed')
+        .addClass('sj-popman-obj-container');
+    if (!getEl(popContainerElement).hasSomeClass(['sj-popman-obj-context-alert', 'sj-popman-obj-context-confirm', 'sj-popman-obj-context-loading'])){
+        getEl(popContainerElement).addClass('sj-popman-obj-context-pop');
+    }
+
     // var ml = pop.marginLeft;
     // var mt = pop.marginTop;
     // var mr = pop.marginRight;
@@ -835,23 +904,32 @@ PopMan.prototype.adjustPossition = function(element, callback){
     // var w = pop.width;
     // var h = pop.height;    
     // popexp
-    var xPopExpMap = this.getSolvedPopExpMap(parentW, pop.expx);
-    var yPopExpMap = this.getSolvedPopExpMap(parentH, pop.expy);    
-    function nvlDan(num, dan){
-        var allLeng = (num+'').length;
-        var onlyNumLeng = (parseFloat(num)+'').length;
-        if (onlyNumLeng == allLeng)
-            result = num + dan;
-        else
-            result = num;
-        return result;
-    }   
-    popContainerElement.style.left = nvlDan(xPopExpMap.pos, 'px');
-    popContainerElement.style.top = nvlDan(yPopExpMap.pos, 'px');
-    popContainerElement.style.width = nvlDan(xPopExpMap.size, 'px');
-    popContainerElement.style.height = nvlDan(yPopExpMap.size, 'px');
+    var popExpMap;
+    if (pop.exp){
+        popExpMap = this.getSolved2DPopExpMap(pop.exp, parentW, parentH);
+        popContainerElement.style.left = this.nvlDan(popExpMap.posX, 'px');
+        popContainerElement.style.top = this.nvlDan(popExpMap.posY, 'px');
+        popContainerElement.style.width = this.nvlDan(popExpMap.sizeX, 'px');
+        popContainerElement.style.height = this.nvlDan(popExpMap.sizeY, 'px');
+    }else{
+        popExpMap = this.getSolvedPopExpMap(pop.expx, parentW);
+        popContainerElement.style.left = this.nvlDan(popExpMap.pos, 'px');
+        popContainerElement.style.width = this.nvlDan(popExpMap.size, 'px');
+        popExpMap = this.getSolvedPopExpMap(pop.expy, parentH);
+        popContainerElement.style.top = this.nvlDan(popExpMap.pos, 'px');
+        popContainerElement.style.height = this.nvlDan(popExpMap.size, 'px');
+    }
 };
-PopMan.prototype.getSolvedPopExpMap = function(parentSize, popexp){    
+PopMan.prototype.nvlDan = function(num, dan){
+    var allLeng = (num+'').length;
+    var onlyNumLeng = (parseFloat(num)+'').length;
+    if (onlyNumLeng == allLeng)
+        result = num + dan;
+    else
+        result = num;
+    return result;
+};
+PopMan.prototype.getSolvedPopExpMap = function(popexp, parentSize){
     var getSize = this.getSize;
     var popExpMap;
     var expStart;
@@ -911,6 +989,28 @@ PopMan.prototype.getSolvedPopExpMap = function(parentSize, popexp){
     }
     return popExpMap;
 };
+PopMan.prototype.getSolved2DPopExpMap = function(popexp, parentSizeX, parentSizeY){
+    var expArray = popexp.split('/');
+    var xPopExpMap;
+    var yPopExpMap;
+    if (expArray.length == 1){
+        var exp = expArray[0].trim();
+        xPopExpMap = this.getSolvedPopExpMap(exp, parentSizeX);
+        yPopExpMap = this.getSolvedPopExpMap(exp, parentSizeY);
+    }else{
+        xPopExpMap = this.getSolvedPopExpMap(expArray[0].trim(), parentSizeX);
+        yPopExpMap = this.getSolvedPopExpMap(expArray[1].trim(), parentSizeY);
+    }
+
+    return {
+        posX: xPopExpMap.pos,
+        sizeX: xPopExpMap.size,
+        posY: yPopExpMap.pos,
+        sizeY: yPopExpMap.size,
+    }
+};
+
+
 PopMan.prototype.getSize = function(parentSize, num){
     if (typeof num == 'undefined'){
         return 0;
@@ -951,9 +1051,12 @@ PopMan.prototype.removeStack = function(popElement){
             popElementStackList.splice(i, 1);
         }
     }
-    if (this.popElementStackList.length == 0){
+    if (this.countStack() == 0){
         this.execEventListenerByEventName('afterlastpop');
     }
+};
+PopMan.prototype.countStack = function(){
+    return this.popElementStackList.length;
 };
 
 
