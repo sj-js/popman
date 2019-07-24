@@ -34,8 +34,8 @@
 
 1. 스크립트 불러오기
     ```html    
-    <script src="https://rawgit.com/sj-js/crossman/master/dist/js/crossman.js"></script>
-    <script src="https://rawgit.com/sj-js/popman/master/dist/js/popman.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/sj-js/crossman/dist/js/crossman.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/sj-js/popman/dist/js/popman.js"></script>
     <script>
          var popman = new PopMan();
     </script>
@@ -68,7 +68,7 @@
             name:'dev1',
             expx:'50%',
             expy:'90%', 
-            easyclose:true,
+            closebyesc:true,
             content: 'This is contents. <br/><br/>', 
             add:function(data){               
                 document.getElementById('tester').innerHTML = 'When add';

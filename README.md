@@ -16,8 +16,8 @@
 
 1. Script
     ```html    
-    <script src="https://rawgit.com/sj-js/crossman/master/dist/js/crossman.js"></script>
-    <script src="https://rawgit.com/sj-js/popman/master/dist/js/popman.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/sj-js/crossman/dist/js/crossman.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/sj-js/popman/dist/js/popman.js"></script>
     <script>
          var popman = new PopMan();
     </script>
