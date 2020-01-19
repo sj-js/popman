@@ -1,17 +1,19 @@
 # PopMan
+## 💬
 [![Build Status](https://travis-ci.org/sj-js/popman.svg?branch=master)](https://travis-ci.org/sj-js/popman)
 [![All Download](https://img.shields.io/github/downloads/sj-js/popman/total.svg)](https://github.com/sj-js/popman/releases)
 [![Release](https://img.shields.io/github/release/sj-js/popman.svg)](https://github.com/sj-js/popman/releases)
 [![License](https://img.shields.io/github/license/sj-js/popman.svg)](https://github.com/sj-js/popman/releases)
     
-- PopMan을 사용하면 새 창을 띄우지 않고 특정정보를 부각시킬 수 있습니다.
-- https://github.com/sj-js/popman
+- 새 창(window)을 띄우지 않고 특정정보를 부각시킬 수 있습니다.
+- Source: https://github.com/sj-js/popman
+- Document: https://sj-js.github.io/sj-js/popman
 
     
 
 
         
-## 0. Index
+## Index
 *@* **order** *@*
 ```
 - PopMan
@@ -29,17 +31,37 @@
 
 ## 1. Getting Started
 
-### 1-1. Load Script
+### 1-1. How to use?
 
 1. 스크립트 불러오기
-    ```html    
+    - Browser
+        ```html    
+        <script src="https://cdn.jsdelivr.net/gh/sj-js/crossman/dist/js/crossman.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/sj-js/popman/dist/js/popman.js"></script>
+        <script>
+             var popman = new PopMan();
+        </script>
+        ```  
+    - ES6+
+        ```bash
+        npm i @sj-js/popman
+        ```
+        ```js
+        const PopMan = require('@sj-js/popman');
+        const popman = new PopMan();
+        ```
+
+
+### 1-2. Simple Example
+- For convenience, the following code, which loads and creates a Library in the example, is omitted.
+    ```html
     <script src="https://cdn.jsdelivr.net/gh/sj-js/crossman/dist/js/crossman.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/sj-js/popman/dist/js/popman.js"></script>
     <script>
          var popman = new PopMan();
     </script>
-    ```  
-    
+    ```
+  
     *@* *+prefix* *x* *@* 
     ```html
     <script src="../crossman/crossman.js"></script>
@@ -51,8 +73,8 @@
 
 
 
-### 1-2. Script
 
+##### Example with script
 1. Test - pop()    
     *@* *!* *@*
     ```html
@@ -131,7 +153,7 @@
 
 
 
-### 1-3. Template          
+##### Example with template          
   
 detect 기능을 이용하여 미리 작성한 HTML에 적용할 수 있습니다.
 

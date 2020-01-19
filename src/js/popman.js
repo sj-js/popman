@@ -2,7 +2,7 @@
  * [Node.js] import
  ***************************************************************************/
 try{
-    var crossman = require('crossman');
+    var crossman = require('@sj-js/crossman');
     var ready = crossman.ready,
         getEl = crossman.getEl,
         newEl = crossman.newEl,
@@ -11,8 +11,9 @@ try{
         ;
 }catch(e){}
 
-
-
+/***************************************************************************
+ * Module
+ ***************************************************************************/
 function PopMan(options){
     var that = this;
     this.event = new SjEvent();
@@ -109,8 +110,6 @@ function PopMan(options){
         }
     });
 
-
-
     if (this.globalSetup.modeResize){
         window.addEventListener('resize', function(){
             that.resize();
@@ -121,8 +120,6 @@ function PopMan(options){
         that.resize();
     });
 }
-
-
 
 /***************************************************************************
  * [Node.js] exports
@@ -819,7 +816,7 @@ PopMan.prototype.loading = function(content, callbackForPromise){
                 var divContentBox = newEl('div')
                     .addClass('sj-popman-obj-box-content')
                     .style('display:block; width:100%; height:100%; text-align:center')
-                    .add(content)
+                    .addEl(content)
                     .returnElement();
                 getEl(popElement).html('').add(divContentBox);
             }
@@ -834,14 +831,15 @@ PopMan.prototype.loading = function(content, callbackForPromise){
     });
     this.add(elementForPopLoading);
     this.pop(elementForPopLoading, null, true);
-    var promise = new Promise(function(resolve, reject){
-        callbackForPromise(resolve, reject);
-    }).then(function(value){
-        that.close(elementForPopLoading);
-    }).catch(function(error){
-        alert(error);
-        that.close(elementForPopLoading);
-    });
+    var promise =
+        new Promise(function(resolve, reject){
+            callbackForPromise(resolve, reject);
+        }).then(function(value){
+            that.close(elementForPopLoading);
+        }).catch(function(error){
+            alert(error);
+            that.close(elementForPopLoading);
+        });
     return promise;
 };
 
@@ -937,7 +935,9 @@ PopMan.prototype.stopPreviewer = function(){
         return;
     }
     //Hide
-    getEl(this.previewer).setStyle('display','none').removeFromParent();
+    getEl(this.previewer).exists(function(it){
+        it.setStyle('display', 'none').removeFromParent();
+    });
     return this;
 };
 PopMan.prototype.movePreviewer = function(event, x, y, content){
