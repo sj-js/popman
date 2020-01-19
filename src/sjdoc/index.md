@@ -1,12 +1,11 @@
 # PopMan
-- PopMan을 사용하면 새 창을 띄우지 않고 특정정보를 부각시킬 수 있습니다.
-
-    [![Build Status](https://travis-ci.org/sj-js/popman.svg?branch=master)](https://travis-ci.org/sj-js/popman)
-    [![All Download](https://img.shields.io/github/downloads/sj-js/popman/total.svg)](https://github.com/sj-js/popman/releases)
-    [![Release](https://img.shields.io/github/release/sj-js/popman.svg)](https://github.com/sj-js/popman/releases)
-    [![License](https://img.shields.io/github/license/sj-js/popman.svg)](https://github.com/sj-js/popman/releases)
+[![Build Status](https://travis-ci.org/sj-js/popman.svg?branch=master)](https://travis-ci.org/sj-js/popman)
+[![All Download](https://img.shields.io/github/downloads/sj-js/popman/total.svg)](https://github.com/sj-js/popman/releases)
+[![Release](https://img.shields.io/github/release/sj-js/popman.svg)](https://github.com/sj-js/popman/releases)
+[![License](https://img.shields.io/github/license/sj-js/popman.svg)](https://github.com/sj-js/popman/releases)
     
-    https://github.com/sj-js/popman
+- PopMan을 사용하면 새 창을 띄우지 않고 특정정보를 부각시킬 수 있습니다.
+- https://github.com/sj-js/popman
 
     
 
