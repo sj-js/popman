@@ -15,11 +15,17 @@ before_deploy:
   - ls dist/js/
   
 deploy:
-  provider: releases
-  api_key:
-    secure: "kTGRj3VZoWDWpC9BS6R5b/+iw1d63HLzxTia4IOzu3RHBzg3xXWKtrh/27YbsNRSgZVwyKBim3jZzc/DQV+9TWjJ5uWoqQrJGzbQFUtSheOdK43eJIe7knXwln/HKNsA0Dhj80JAI3nC9IkeQpG4P9RsRhoZd2pCTdQD5heWiwqW3VCrPeWctZeHujTxxxOMlCh47IdiNRfBxaTPpTKd0mWhIawbLbHHccSdbiI/+ciBx5Ty27msP/NalN4YRs4WDVgwvM+FzHcPFuNw/CKrhWf5WUGxJDIKdfs6HghrRWHPp5mAUQvj+NYd59v+bwhR7nRLjjht5ioQbe83DlyamLcYp2VXcVinX8Dr/uh+FayHDLqqy6z+Hv9ax4nlfU3SP9vV6MtTgvjn7aMbxgcoZkNoSjRsi6O4e9Dybg/ski2t21Wgyh0MSa5wCt6CV6sBvv0+nBK2QcJtmI5ojgvTclZSv8aXLJySG22u/yU0irZzkcUM6z2JoskjCE95vNmoVDVl55ANN5kShQKCbRbV/teLzULnk1ZlI3WeNmHCcjVg0SKB4f5baAI0HcU6Y6YbNyJdhIPf7l78NlPwM/2WkHB9U7VbgV4ZpY/Gqg3xMhsaU5c6+HLw7heNeEHXuLhK2NEqv/bbcLyobBJtOPDoJ+cTCQCPGpekW2Fj2WnbE6U="
-  file: dist/js/popman.min.js
-  skip_cleanup: true
-  on:
-    repo: sj-js/popman
-    branch: master
+  - provider: releases
+    api_key:
+      secure: "c1w+jXyxc7V7h23+cqEDVhU0gvuKsVCK7VtqyM5BLaE1CMdc8RUKeQTs8CSFZx2H3Pzcnr3+y2/ikaC/4/Vr3sk0M26jZwrT79rlOo+jvzgdsCLeaVneL6yO0VtJtUAZabcXsNqKDd4UN1DmiXTuGOI83L4KPh+F60o91phBQHq5CspE6WNIn0OmYz6cf0f60FUILf7vaTN9V1Oy0VKfl6LwQh7bQbxe1uNEkAIlR+aG5sVXfh07/Pz143eFOKcPaZDdJnHS2FH9FFrszf1V9owCQFVjfOXrOwxeEWOdAAs9SBvxIXEBzBokVcvXSuALzkVQUs0SjmieLd0T6yffxnXvHPlfxaWH+ti6pYI2IU4HmEEiQ2uOc4Hv5PUjl8YTUO6fnFWMZ7sVwfvxtRM5EksELHq2YIMzVKsLb90+up3n1uvazeh4J6ZLenmKzoUvPd9TvkZmXvGr1DXZONCKmfz/TYxwK1O1dOmgLf86VsjvmxV9WWLcbC9gPHhigTYckZqM9Nd5vd2KivNPyEZFAyoLuTSYILuINn+gvLxjYwJL/9QYM3CV2s1EPcZreFt+44kQPfh72KAyMb3ICfpUylgXOuPqMEFSW/9LgEtGBhQdB34wgb4b834VxK3FOjCunUfjZRGwAVayLrMNtPq6/wG3D7az4AjzUM5FTwn60l8="
+    file: dist/js/popman.min.js
+    skip_cleanup: true
+    on:
+      repo: sj-js/popman
+      branch: master
+  - provider: npm
+    email: "$NPM_EMAIL"
+    api_key: "$NPM_API_TOKEN"
+    skip_cleanup: true
+    on:
+      branch: master

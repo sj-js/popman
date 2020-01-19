@@ -1,6 +1,6 @@
 {
-  "name": "popman",
-  "version": "1.0.2",
+  "name": "@sj-js/popman",
+  "version": "1.0.4",
   "description": "popman",
   "main": "./index.js",
   "author": "souljungkim@gmail.com",
@@ -14,6 +14,9 @@
     "type": "git",
     "url": "https://github.com/sj-js/popman.git",
     "web": "https://github.com/sj-js/popman"
+  },
+  "dependencies": {
+    "@sj-js/crossman": "^1.0.4"
   },
   "devDependencies": {
     "gulp": "^4.0.2",
@@ -37,8 +40,5 @@
     "lodash": "4.17.13",
     "lodash.template": "4.5.0",
     "open": "6.0.0"
-  },
-  "dependencies": {
-    "crossman": "^1.0.2"
   }
 }
