@@ -31,64 +31,62 @@
 
 ## 1. Getting Started
 
-### 1-1. How to use?
-
-1. 스크립트 불러오기
-    - Browser
-        ```html    
-        <script src="https://cdn.jsdelivr.net/gh/sj-js/crossman/dist/js/crossman.js"></script>
-        <script src="https://cdn.jsdelivr.net/gh/sj-js/popman/dist/js/popman.js"></script>
-        <script>
-             var popman = new PopMan();
-        </script>
-        ```  
-    - ES6+
-        ```bash
-        npm i @sj-js/popman
-        ```
-        ```js
-        const PopMan = require('@sj-js/popman');
-        const popman = new PopMan();
-        ```
-
-
-### 1-2. Simple Example
-- For convenience, the following code, which loads and creates a Library in the example, is omitted.
-    ```html
-    <script src="https://cdn.jsdelivr.net/gh/sj-js/crossman/dist/js/crossman.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/sj-js/popman/dist/js/popman.js"></script>
+### 1-1. How to load?
+- Browser
+    ```html    
+    <script src="https://cdn.jsdelivr.net/npm/@sj-js/crossman/dist/js/crossman.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@sj-js/popman/dist/js/popman.js"></script>
     <script>
          var popman = new PopMan();
     </script>
     ```
-  
     *@* *+prefix* *x* *@* 
     ```html
     <script src="../crossman/crossman.js"></script>
     <script src="../popman/popman.js"></script>
     <script>
-         var popman = new PopMan();
+        var popman = new PopMan();
     </script>
+    ```  
+- ES6+
+    ```bash
+    npm i @sj-js/popman
+    ```
+    ```js
+    const PopMan = require('@sj-js/popman');
+    const popman = new PopMan();
     ```
 
 
+### 1-2. Simple Example
+For convenience, 1-1 code, which loads and creates a Library in the example, is omitted.
 
-
-##### Example with script
-1. Test - pop()    
+##### Exapmle - with script
+1. `popman.new({OPTIONS})`로 POP Element를 등록합니다.
+    ```html
+    popman.new({
+        id:'pop-test',
+        exp:'50%/90%',
+        content: 'This is contents.' 
+    });
+    ```
+2. `popman.pop('Element ID')`로 POP Element를 호출합니다.
+    ```js
+    popman.pop('pop-test');
+    ```
+3. 👨‍💻
     *@* *!* *@*
     ```html
     <body>        
         Hello Popman
-        <button onclick="popman.pop({name:'dev1'});">POP</button>
+        <button onclick="popman.pop('pop-test');">POP</button>
         <div id="tester">TEST</div>
     </body> 
     <script>
         popman.setup({modeTest:true});
         popman.new({
-            name:'dev1',
-            expx:'50%',
-            expy:'90%', 
+            id:'pop-test',
+            exp:'50%/90%',
             closebyesc:true,
             content: 'This is contents. <br/><br/>', 
             add:function(data){               
@@ -103,8 +101,49 @@
         });
     </script>
     ```
+
+
+##### Exapmle - with template    
+1. POP Element에 `data-pop`속성 을 명시합니다.
+    ```html
+    <div id="pop-test" data-pop data-exp="300/200" >
+        Contents..
+    </div>
+    ```
+    **data-exp**속성으로 가로/세로 크기를 설정할 수 있습니다.
+2. `.detect()`를 사용하면 **data-pop** 속성을 가진 element를 등록합니다.
+    ```js
+    popman.detect();
+    ```
+3. `.pop('Element ID')`를 호출하면 화면에 표시됩니다.
+    ```js
+    popman.pop('pop-test');
+    ```
+4. 👨‍💻
+    *@* *!* *@*
+    ```html
+    <script>
+        popman.setup({modeTest:true});
+    </script>
     
-2. Test - alert()
+    <body>
+        <button onclick="popman.pop('pop-test');">POP</button>
+        <div id="pop-test" data-pop data-exp="300/200" data-closebyclickin >
+            <br/>
+            <div id="divAlertMsg" style="font-size:35px; color:white; border:2px solid; background:#F08047;">
+                TEST
+            </div>
+            <div id="divAlert1stMsg">
+                TEST
+            </div>
+        </div>       
+    </body>
+    ```
+  
+
+
+##### Exapmle - alert()
+- 👨‍💻    
     *@* *!* *@*
     ```html
     <body>
@@ -112,12 +151,15 @@
         <button onclick="popman.alert('Alert!');">ALERT</button>
     </body>
     <script>
-        popman.setup({modeTest:true, alertExpx:'200', alertExpy:'100'});   
-        popman.alert('Alert');        
+        popman.setup({modeTest:true, alertExp:'200/100'});   
+        popman.alert('Alert Something');        
     </script>
     ```
+  
+  
     
-3. Test - confirm()
+##### Exapmle - confirm()
+- 👨‍💻
     *@* *!* *@*
     ```html
     <body>
@@ -125,12 +167,15 @@
         <button onclick="popman.confirm('Confirm!');">CONFIRM</button>
     </body>
     <script>
-        popman.setup({modeTest:true, confirmExpx:'300', confirmExpy:'150'});
-        popman.confirm('Confirm');        
+        popman.setup({modeTest:true, confirmExp:'300/150'});
+        popman.confirm('Confirm Something');        
     </script>
     ```
     
-4. Test - loading()    
+    
+    
+##### Exapmle - loading()
+- 👨‍💻
     *@* *!* *@*
     ```html
     <body>
@@ -138,10 +183,10 @@
         <button onclick="loadSomething();">LOAD</button>
     </body>
     <script>
-        popman.setup({modeTest:true, loadingExpx:'150', loadingExpy:'150'}); 
+        popman.setup({modeTest:true, loadingExp:'150/150'}); 
         
         function loadSomething(){
-            popman.loading('LOADING', function(resolve, reject){ 
+            popman.loading('LOADING..  Something..', function(resolve, reject){ 
                 setTimeout(function(){ 
                      resolve();
                 }, 2000);             
@@ -152,36 +197,4 @@
     ```
 
 
-
-##### Example with template          
-  
-detect 기능을 이용하여 미리 작성한 HTML에 적용할 수 있습니다.
-
-1. Element에 다음 속성을 명시합니다.
-    - `data-pop`
-
-2. `detect()`를 사용합니다.
-    ```js
-    popman.detect();
-    ```
-
-3. Test
-    *@* *!* *@*
-    ```html
-    <script>
-        popman.setup({modeTest:true});
-        popman.detect();      
-    </script>
-    
-    <body>
-        <button onclick="popman.pop('popup-alert');">POP</button>
-        <div id="popup-alert" data-pop data-expx="*(300)*" data-expy="*(200)*" data-closebyclickin >
-            <br/>
-            <div id="divAlertMsg" style="font-size:35px; font-weight:bold; color:white; border:2px solid; background:#F08047;">TEST</div>
-            <br/>
-            <div id="divAlert1stMsg" style="font-size:15px; font-weight:bold; ">TEST</div>
-        </div>       
-     </body>
-    ```
-  
   
