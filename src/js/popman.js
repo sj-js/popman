@@ -816,7 +816,7 @@ PopMan.prototype.loading = function(content, callbackForPromise){
                 var divContentBox = newEl('div')
                     .addClass('sj-popman-obj-box-content')
                     .style('display:block; width:100%; height:100%; text-align:center')
-                    .addEl(content)
+                    .add(content)
                     .returnElement();
                 getEl(popElement).html('').add(divContentBox);
             }
@@ -843,7 +843,19 @@ PopMan.prototype.loading = function(content, callbackForPromise){
     return promise;
 };
 
-
+PopMan.prototype.loadingUntil = function(content, checkFunction, interval){
+    interval = interval ? interval : 1000;
+    this.loading(content, function(resolve, reject){
+        (function again(){
+            setTimeout(function(){
+                if (checkFunction())
+                    return resolve();
+                again();
+            }, interval);
+        })();
+    });
+    return this;
+};
 
 
 
