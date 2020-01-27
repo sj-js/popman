@@ -123,7 +123,7 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
     *@* *!* *@*
     ```html
     <script>
-        popman.setup({modeTest:true});
+        popman.setup({modeTest:true}).detect();
     </script>
     
     <body>
