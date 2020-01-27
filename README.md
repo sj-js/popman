@@ -13,15 +13,25 @@
 
 ## Getting Started
 
-1. Load
-    ```html    
-    <script src="https://cdn.jsdelivr.net/npm/@sj-js/crossman/dist/js/crossman.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@sj-js/popman/dist/js/popman.min.js"></script>
-    <script>
-         var popman = new PopMan();
-    </script>
-    ```  
-2. `popman.new({OPTIONS})`로 POP Element를 등록합니다.
+0. Load
+    - Browser
+        ```html    
+        <script src="https://cdn.jsdelivr.net/npm/@sj-js/crossman/dist/js/crossman.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@sj-js/popman/dist/js/popman.min.js"></script>
+        <script>
+             var popman = new PopMan();
+        </script>
+        ```
+    - ES6+
+        ```bash
+        npm i @sj-js/popman
+        ```
+        ```js
+        const PopMan = require('@sj-js/popman');
+        const popman = new PopMan();
+        ```
+      
+1. `popman.new({OPTIONS})`로 POP Element를 등록합니다.
     ```html
     popman.new({
         id:'pop-test',
@@ -29,11 +39,13 @@
         content: 'This is contents.' 
     });
     ```
-3. `popman.pop('Element ID')`로 POP Element를 호출합니다.
+   
+2. `popman.pop('Element ID')`로 POP Element를 호출합니다.
     ```js
     popman.pop('pop-test');
     ```
-4. Simple Example
+   
+3. Simple Example
     ```html
     <!DOCTYPE html>
     <HTML>
