@@ -6,8 +6,8 @@
 [![License](https://img.shields.io/github/license/sj-js/popman.svg)](https://github.com/sj-js/popman/releases)
     
 - 새 창(window)을 띄우지 않고 특정정보를 부각시킬 수 있습니다.
-- Source: https://github.com/sj-js/popman
-- Document: https://sj-js.github.io/sj-js/popman
+- ✨ Source: https://github.com/sj-js/popman
+- ✨ Document: https://sj-js.github.io/sj-js/popman
 
     
 
@@ -34,8 +34,8 @@
 ### 1-1. How to load?
 - Browser
     ```html    
-    <script src="https://cdn.jsdelivr.net/npm/@sj-js/crossman/dist/js/crossman.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@sj-js/popman/dist/js/popman.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@sj-js/crossman/dist/js/crossman.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@sj-js/popman/dist/js/popman.min.js"></script>
     <script>
          var popman = new PopMan();
     </script>
