@@ -728,12 +728,9 @@ PopMan.prototype.alert = function(content, callbackForOk){
                 .appendTo(divContextAlert)
                 .html('O')
                 .addEventListener('click', function(){
-                    console.error('asdf', callbackForOk);
                     if (callbackForOk && !callbackForOk()){
-                        console.error('asdf', '실패');
                         return;
                     }
-                    console.error('asdf2', callbackForOk, popElement);
                     that.close(popElement);
                 })
                 .returnElement();
@@ -852,9 +849,6 @@ PopMan.prototype.loading = function(content, callbackForPromise){
 
             //User Set Content
             if (content){
-                // getEl(popElement.parentNode)
-                //     .removeClass('sj-popman-obj-context-pop')
-                //     .addClass('sj-popman-obj-context-loading');
                 var divContentBox = newEl('div')
                     .addClass('sj-popman-obj-content')
                     .style('display:block; width:100%; height:100%; text-align:center')
@@ -1248,7 +1242,7 @@ PopMan.prototype.getSolvedPopExpMap = function(popexp, parentSize){
         }else if (expEndHasNoValue){
             expEnd = '*';
         }
-        console.log(popexp + ': ', expStart, expSize, expEnd);
+        // console.log(popexp + ': ', expStart, expSize, expEnd);
         //- Minimum and Maximum
         start = this.getSize(parentSize, expStart, function(min, s, max) {
             if (s == '*')
