@@ -1,6 +1,6 @@
 {
   "name": "@sj-js/popman",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "popman",
   "main": "./index.js",
   "author": "souljungkim@gmail.com",
