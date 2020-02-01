@@ -86,7 +86,7 @@ afterclose | Function | null | 'close' Event 후에 발생하는 Event
         popman.pop(newPopNode);
     </script>
     ```
- - `popman.pop(ID)` or `popman.pop({PROPERTIES})`
+- `popman.pop(ID)` or `popman.pop({PROPERTIES})`
     *@* *!* *@*
     ```html
     <body>
@@ -207,6 +207,7 @@ afterclose | Function | null | 'close' Event 후에 발생하는 Event
             id: 'poptest',
             content: 'NOTICE<br/> Hello popman',
             modeTest: true,
+            modeAuto: true,
             add: function(data){
                 var buttonToClose = document.createElement('button');
                 buttonToClose.innerHTML = 'Close this pop';
@@ -249,6 +250,7 @@ afterclose | Function | null | 'close' Event 후에 발생하는 Event
             closebyclickout: false,    //Click outisde of pop element to close
             closebyesc: false,         //Press [ESC] button to close
             modeTest: true,
+            modeAuto: true,
             add: function(data){
                 var buttonToClose = document.createElement('button');
                 buttonToClose.innerHTML = 'Close this pop';
