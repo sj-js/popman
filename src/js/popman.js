@@ -36,7 +36,7 @@ function PopMan(options){
         latestPopStartTime: null,
     };
     /** Mode **/
-    this.modeAnimation = true;
+    this.modeAnimation = true;  //TODO: Experimental
     this.modeSleep = false;
     this.globalSetup = {
         modeTest: false,
@@ -299,8 +299,8 @@ PopMan.prototype.set = function(element, infoObj){
     infoObj.id = popmanId;
     infoObj.popmanId = popmanId;
     infoObj.element = element;
-    infoObj.modeDark = (infoObj.modeDark) ? infoObj.modeDark : that.globalSetup.modeDark;
-    infoObj.modeTest = (infoObj.modeTest) ? infoObj.modeTest : that.globalSetup.modeTest;
+    infoObj.modeDark = (infoObj.modeDark != null) ? infoObj.modeDark : that.globalSetup.modeDark;
+    infoObj.modeTest = (infoObj.modeTest != null) ? infoObj.modeTest : that.globalSetup.modeTest;
     infoObj.darkElement = null;
     infoObj.isPoped = false;
 
@@ -716,20 +716,24 @@ PopMan.prototype.alert = function(content, callbackForOk){
                     return false;
                 return true;
             });
-            var divContextAlert = newEl('div').addClass('sj-popman-obj-context-alert')
+            var divContextAlert = newEl('div')
                 .style('display:block; width:100%; height:100%; text-align:center;')
                 .returnElement();
-            var divContentBox = newEl('div').addClass('sj-popman-obj-box-content')
+            var divContentBox = newEl('div').addClass('sj-popman-obj-content')
                 .style('display:block; width:100%; text-align:center;')
                 .appendTo(divContextAlert)
                 .returnElement();
-            var btnForOk = newEl('button').addClass('sj-popman-obj-btn-alert')
+            var btnForOk = newEl('button').addClass(['sj-popman-obj-btn', 'sj-popman-obj-btn-alert'])
                 .style('display:inline-block;')
                 .appendTo(divContextAlert)
                 .html('O')
                 .addEventListener('click', function(){
-                    if (callbackForOk && !callbackForOk())
+                    console.error('asdf', callbackForOk);
+                    if (callbackForOk && !callbackForOk()){
+                        console.error('asdf', '실패');
                         return;
+                    }
+                    console.error('asdf2', callbackForOk, popElement);
                     that.close(popElement);
                 })
                 .returnElement();
@@ -745,7 +749,8 @@ PopMan.prototype.alert = function(content, callbackForOk){
             that.removePop(data.element);
         }
     });
-    this.add(elementForPopAlert);
+    // this.add(elementForPopConfirm);
+    getEl(elementForPopAlert.parentNode).removeClass('sj-popman-obj-context-pop').addClass('sj-popman-obj-context-alert');
     this.pop(elementForPopAlert, null, true);
     return elementForPopAlert;
 };
@@ -777,24 +782,25 @@ PopMan.prototype.confirm = function(content, callbackForOk, callbackForCancel){
                     return false;
                 return true;
             });
-            var divContextConfirm = newEl('div').addClass('sj-popman-obj-context-confirm')
+            var divContextConfirm = newEl('div')
                 .style('display:block; width:100%; height:100%; text-align:center;')
                 .returnElement();
-            var divContentBox = newEl('div').addClass('sj-popman-obj-box-content')
+            var divContentBox = newEl('div').addClass('sj-popman-obj-content')
                 .style('display:block; width:100%; text-align:center;')
                 .appendTo(divContextConfirm)
                 .returnElement();
-            var btnForOk = newEl('button').addClass('sj-popman-obj-btn-confirm')
+            var btnForOk = newEl('button').addClass(['sj-popman-obj-btn', 'sj-popman-obj-btn-confirm'])
                 .style('display:inline-block;')
                 .html('O')
                 .appendTo(divContextConfirm)
                 .addEventListener('click', function(){
-                    if (callbackForOk && !callbackForOk())
+                    if (callbackForOk && !callbackForOk()){
                         return;
+                    }
                     that.close(popElement);
                 })
                 .returnElement();
-            var btnForCancel = newEl('button').addClass('sj-popman-obj-btn-cancel')
+            var btnForCancel = newEl('button').addClass(['sj-popman-obj-btn', 'sj-popman-obj-btn-cancel'])
                 .style('display:inline-block;')
                 .html('X')
                 .appendTo(divContextConfirm)
@@ -816,7 +822,8 @@ PopMan.prototype.confirm = function(content, callbackForOk, callbackForCancel){
             that.removePop(data.element);
         }
     });
-    this.add(elementForPopConfirm);
+    // this.add(elementForPopConfirm);
+    getEl(elementForPopConfirm.parentNode).removeClass('sj-popman-obj-context-pop').addClass('sj-popman-obj-context-confirm');
     this.pop(elementForPopConfirm, null, true);
     return elementForPopConfirm;
 };
@@ -845,11 +852,11 @@ PopMan.prototype.loading = function(content, callbackForPromise){
 
             //User Set Content
             if (content){
-                getEl(popElement.parentNode)
-                    .removeClass('sj-popman-obj-context-pop')
-                    .addClass('sj-popman-obj-context-loading');
+                // getEl(popElement.parentNode)
+                //     .removeClass('sj-popman-obj-context-pop')
+                //     .addClass('sj-popman-obj-context-loading');
                 var divContentBox = newEl('div')
-                    .addClass('sj-popman-obj-box-content')
+                    .addClass('sj-popman-obj-content')
                     .style('display:block; width:100%; height:100%; text-align:center')
                     .add( newEl('div').html(content) )
                     .returnElement();
@@ -864,7 +871,8 @@ PopMan.prototype.loading = function(content, callbackForPromise){
             that.removePop(data.element);
         }
     });
-    this.add(elementForPopLoading);
+    // this.add(elementForPopConfirm);
+    getEl(elementForPopLoading.parentNode).removeClass('sj-popman-obj-context-pop').addClass('sj-popman-obj-context-loading');
     this.pop(elementForPopLoading, null, true);
     var promise =
         new Promise(function(resolve, reject){
@@ -1022,7 +1030,7 @@ PopMan.prototype.movePreviewer = function(event, x, y, content){
 
 /***************************************************************************
  *
- *  Focus
+ *  Focus //TODO: Experimental..
  *
  ***************************************************************************/
 PopMan.prototype.focusOn = function(el){
