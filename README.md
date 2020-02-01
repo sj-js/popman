@@ -32,10 +32,10 @@
         ```
       
 1. `popman.new({OPTIONS})`로 POP Element를 등록합니다.
-    ```html
+    ```js
     popman.new({
-        id:'pop-test',
-        exp:'50%/90%',
+        id:'pop-test', //Pop Element ID
+        exp:'50%/90%', //Width and Height
         content: 'This is contents.' 
     });
     ```
@@ -44,7 +44,7 @@
     ```js
     popman.pop('pop-test');
     ```
-   
+      
 3. Simple Example
     ```html
     <!DOCTYPE html>

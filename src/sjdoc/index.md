@@ -17,11 +17,13 @@
 *@* **order** *@*
 ```
 - PopMan
-- new() and pop()
+- New/Pop/Close
+- Expression
+- Alert
+- Confirm
+- Loading
+- Preview
 - Event
-- alert()
-- confirm()
-- loading()
 - Functions
 - Theme
 - Example
@@ -58,22 +60,25 @@
     ```
 
 
+
 ### 1-2. Simple Example
 For convenience, 1-1 code, which loads and creates a Library in the example, is omitted.
 
-##### Exapmle - with script
+##### Exapmle - popman.pop() with script
 1. `popman.new({OPTIONS})`로 POP Element를 등록합니다.
-    ```html
+    ```js
     popman.new({
-        id:'pop-test',
-        exp:'50%/90%',
+        id:'pop-test', //Pop Element ID
+        exp:'50%/90%', //Width and Height
         content: 'This is contents.' 
     });
     ```
+   
 2. `popman.pop('Element ID')`로 POP Element를 호출합니다.
     ```js
     popman.pop('pop-test');
     ```
+   
 3. 👨‍💻
     *@* *!* *@*
     ```html
@@ -88,7 +93,8 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
             id:'pop-test',
             exp:'50%/90%',
             closebyesc:true,
-            content: 'This is contents. <br/><br/>', 
+            content:'This is contents. <br/><br/>',
+            modeAuto:true,     //Open automatically 
             add:function(data){               
                 document.getElementById('tester').innerHTML = 'When add';
             },
@@ -103,19 +109,19 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
     ```
 
 
-##### Exapmle - with template    
-1. POP Element에 `data-pop`속성 을 명시합니다.
+
+##### Exapmle - popman.pop() with template    
+1. Pop Element에 `data-pop`속성을 설정합니다.
     ```html
     <div id="pop-test" data-pop data-exp="300/200" >
-        Contents..
+        Pop contents with template
     </div>
     ```
-    **data-exp**속성으로 가로/세로 크기를 설정할 수 있습니다.
-2. `.detect()`를 사용하면 **data-pop** 속성을 가진 element를 등록합니다.
+2. `popman.detect()`를 사용하면 **data-pop** 속성을 가진 element가 등록됩니다.
     ```js
     popman.detect();
     ```
-3. `.pop('Element ID')`를 호출하면 화면에 표시됩니다.
+3. `popman.pop('ID')`를 호출하면 화면에 표시됩니다.
     ```js
     popman.pop('pop-test');
     ```
@@ -128,7 +134,7 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
     
     <body>
         <button onclick="popman.pop('pop-test');">POP</button>
-        <div id="pop-test" data-pop data-exp="300/200" data-closebyclickin >
+        <div id="pop-test" data-pop data-exp="300/200" data-closebyclickin data-mode-auto>
             <br/>
             <div id="divAlertMsg" style="font-size:35px; color:white; border:2px solid; background:#F08047;">
                 TEST
@@ -142,7 +148,7 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
   
 
 
-##### Exapmle - alert()
+##### Exapmle - popman.alert()
 - 👨‍💻    
     *@* *!* *@*
     ```html
@@ -152,13 +158,16 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
     </body>
     <script>
         popman.setup({modeTest:true, alertExp:'200/100'});   
-        popman.alert('Alert Something');        
+        popman.alert('Alert Something', function(){
+            alert('Alert! Ok!');
+            return true;
+        });        
     </script>
     ```
   
   
     
-##### Exapmle - confirm()
+##### Exapmle - popman.confirm()
 - 👨‍💻
     *@* *!* *@*
     ```html
@@ -168,13 +177,22 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
     </body>
     <script>
         popman.setup({modeTest:true, confirmExp:'300/150'});
-        popman.confirm('Confirm Something');        
+        popman.confirm('Confirm Something',
+            function(){
+                alert('OK!');
+                return true;
+            },
+            function(){
+                alert('Cancel!');
+                return true;
+            },
+        );        
     </script>
     ```
     
     
     
-##### Exapmle - loading()
+##### Exapmle - popman.loading()
 - 👨‍💻
     *@* *!* *@*
     ```html
@@ -183,7 +201,7 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
         <button onclick="loadSomething();">LOAD</button>
     </body>
     <script>
-        popman.setup({modeTest:true, loadingExp:'150/150'}); 
+        popman.setup({modeTest:true, loadingExp:'80%/100'}); 
         
         function loadSomething(){
             popman.loading('LOADING..  Something..', function(resolve, reject){ 

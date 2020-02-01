@@ -34,4 +34,14 @@
     </body>
     ```
   
-## focusOn()
+
+  
+## sleep()
+popman이 동작하지 않게 합니다.
+
+
+## active()
+popman이 동작하게 합니다.
+  
+  
+  

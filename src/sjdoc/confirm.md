@@ -1,4 +1,4 @@
-# confirm()
+# Confirm
 `Yes` or `No` 의 선택이 필요할때 사용합니다.
 
 *@* *+prefix* *x* *@*
