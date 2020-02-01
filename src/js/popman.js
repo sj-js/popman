@@ -36,13 +36,13 @@ function PopMan(options){
         latestPopStartTime: null,
     };
     /** Mode **/
-    this.modeAnimation = true;  //TODO: Experimental
     this.modeSleep = false;
     this.globalSetup = {
         modeTest: false,
         modeResize: true,
         modeDark: true,
         modeAuto: false,
+        modeAnimation: false,   //TODO: Experimental
         testPopClass: null,
         testPopBorderWidth: '1px',
         testPopBorderColor: '#39ff3e',
@@ -567,7 +567,7 @@ PopMan.prototype.pop = function(element, callback, force){
     if (callback)
         callback(pop);
     //Animation - FadeIn
-    if (this.modeAnimation && pop.modeAnimation){
+    if (this.globalSetup.modeAnimation && pop.modeAnimation){
         pop.animation = (pop.animation) ? pop.animation : this.generateDefaultAnimation(pop);
         pop.animation.fadeIn(function(){
             // getEl(pop.popContainerElement).setStyle('borderColor', 'red');
@@ -920,7 +920,7 @@ PopMan.prototype.setPreview = function(element, infoObj){
     // this.createPreviewer();
 
     getEl(element)
-        .addClass('sj-boxman-obj-previewable')
+        .addClass('sj-popman-obj-previewable')
         .addEventListener('mouseout', function(event){
             that.stopPreviewer();
         })
@@ -939,7 +939,7 @@ PopMan.prototype.setPreview = function(element, infoObj){
                 event.preventDefault();
                 //- Searching ParentNode
                 checkNode = event.target;
-                while ((!checkNode.classList || !checkNode.classList.contains('sj-boxman-obj-previewable')) && (checkNode = checkNode.parentNode)){ }
+                while ((!checkNode.classList || !checkNode.classList.contains('sj-popman-obj-previewable')) && (checkNode = checkNode.parentNode)){ }
                 if (!checkNode)
                     return;
             }
@@ -952,7 +952,7 @@ PopMan.prototype.createPreviewer = function(){
     if (this.previewer == undefined){
         this.previewer = newEl('div')
             .html('test')
-            .addClass('sj-boxman-obj-previewer')
+            .addClass('sj-popman-obj-previewer')
             .setStyle('display', 'none')
             .setStyle('position', 'absolute')
             .appendTo(document.body)
@@ -972,7 +972,7 @@ PopMan.prototype.startPreviewer = function(event, x, y, content, classes){
         getEl(this.previewer).addClass(classes);
     this.movePreviewer(event, x, y, content);
     //Animation - FadeIn
-    if (this.modeAnimation){
+    if (this.globalSetup.modeAnimation){
         this.previewerAnimation = (this.previewerAnimation) ? this.previewerAnimation : this.generateDefaultPreviewAnimation(this.previewer);
         this.previewerAnimation.fadeIn(function(){
             // getEl(this.previewer).setStyle('borderColor', 'red');
