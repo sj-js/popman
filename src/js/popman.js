@@ -132,6 +132,16 @@ try{
 
 
 
+PopMan.EVENT_ADD = 'add';
+PopMan.EVENT_POP = 'pop';
+PopMan.EVENT_CLOSE = 'close';
+PopMan.EVENT_AFTERPOP = 'afterpop';
+PopMan.EVENT_AFTERPOP = 'afterclose';
+PopMan.EVENT_AFTERDETECT = 'afterdetect';
+PopMan.EVENT_BEFOREFIRSTPOP = 'beforefirstpop';
+PopMan.EVENT_AFTERLASTPOP = 'afterlastpop';
+
+
 
 PopMan.prototype.setup = function(options){
     for (var objName in options){
@@ -205,15 +215,20 @@ PopMan.prototype.resize = function(){
  *
  *************************/
 PopMan.prototype.addEventListener               = function(element, eventName, eventFunc){ this.event.addEventListener(element, eventName, eventFunc); return this; };
+PopMan.prototype.addEventListenerById           = function(element, eventName, eventFunc){ this.event.addEventListenerById(element, eventName, eventFunc); return this; };
 PopMan.prototype.addEventListenerByEventName    = function(eventName, eventFunc){ this.event.addEventListenerByEventName(eventName, eventFunc); return this; };
 PopMan.prototype.hasEventListener               = function(element, eventName, eventFunc){ return this.event.hasEventListener(element, eventName, eventFunc); };
+PopMan.prototype.hasEventListenerById           = function(element, eventName, eventFunc){ return this.event.hasEventListenerById(element, eventName, eventFunc); };
 PopMan.prototype.hasEventListenerByEventName    = function(eventName, eventFunc){ return this.event.hasEventListenerByEventName(eventName, eventFunc); };
 PopMan.prototype.hasEventListenerByEventFunc    = function(eventFunc){ return this.event.hasEventListenerByEventFunc(eventFunc); };
 PopMan.prototype.removeEventListener            = function(element, eventName, eventFunc){ return this.event.removeEventListener(element, eventName, eventFunc); };
+PopMan.prototype.removeEventListenerById        = function(element, eventName, eventFunc){ return this.event.removeEventListenerById(element, eventName, eventFunc); };
 PopMan.prototype.removeEventListenerByEventName = function(eventName, eventFunc){ return this.event.removeEventListenerByEventName(eventName, eventFunc); };
 PopMan.prototype.removeEventListenerByEventFunc = function(eventFunc){ return this.event.removeEventListenerByEventFunc(eventFunc); };
 PopMan.prototype.execEventListener              = function(element, eventName, event){ return this.event.execEventListener(element, eventName, event); };
+PopMan.prototype.execEventListenerById          = function(element, eventName, event){ return this.event.execEventListenerById(element, eventName, event); };
 PopMan.prototype.execEventListenerByEventName   = function(eventName, event){ return this.event.execEventListenerByEventName(eventName, event); };
+PopMan.prototype.execEvent                      = function(eventMap, eventNm, event){ return this.event.execEvent(eventMap, eventNm, event); };
 
 
 
@@ -257,11 +272,11 @@ PopMan.prototype.add = function(element){
         closebyesc:         getData(element.getAttribute('data-closebyesc')).parse(),
         closebyclickout:    getData(element.getAttribute('data-closebyclickout')).parse(),
         closebyclickin:     getData(element.getAttribute('data-closebyclickin')).parse(),
-        add:                element.getAttribute('data-add'),
-        pop:                element.getAttribute('data-pop'),
-        afterpop:           element.getAttribute('data-afterpop'),
-        close:              element.getAttribute('data-close'),
-        afterclose:         element.getAttribute('data-afterclose'),
+        add:                element.getAttribute('data-event-add'),
+        pop:                element.getAttribute('data-event-pop'),
+        afterpop:           element.getAttribute('data-event-afterpop'),
+        close:              element.getAttribute('data-event-close'),
+        afterclose:         element.getAttribute('data-event-afterclose'),
     });
     return element;
 };
@@ -331,25 +346,8 @@ PopMan.prototype.set = function(element, infoObj){
     this.popMap[popmanId] = infoObj;
     this.popElementIdMap[element.id] = infoObj;
 
-    //EVENT
-    if (infoObj.pop)
-        this.addEventListener(element, 'pop', infoObj.pop);
-    if (infoObj.afterpop)
-        this.addEventListener(element, 'afterpop', infoObj.afterpop);
-    if (infoObj.add){
-        if (infoObj.add instanceof Function){
-            this.addEventListener(element, 'add', infoObj.add);
-            infoObj.add(infoObj);
-        }else if (typeof infoObj.add == 'string'){
-            element.innerHTML = infoObj.add;
-        }
-    }
-    if (infoObj.ok)
-        this.addEventListener(element, 'ok', infoObj.ok);
-    if (infoObj.close)
-        this.addEventListener(element, 'close', infoObj.close);
-    if (infoObj.afterclose)
-        this.addEventListener(element, 'afterclose', infoObj.afterclose);
+    //Set Event
+    this.setPopEvent(infoObj);
 
     if (infoObj.modeAuto)
         this.pop(infoObj.element);
@@ -454,6 +452,24 @@ PopMan.prototype.setTestView = function(infoObj, globalSetup){
             element.style.background = globalSetup.testPopBackground;
         }
     }
+};
+PopMan.prototype.setPopEvent = function(infoObj){
+    var element = infoObj.element;
+    //EVENT
+    if (infoObj.pop)
+        this.addEventListener(element, 'pop', ((infoObj.pop instanceof Function) ? infoObj.pop : new Function('event', infoObj.pop)));
+    if (infoObj.afterpop)
+        this.addEventListener(element, 'afterpop', ((infoObj.afterpop instanceof Function) ? infoObj.afterpop : new Function('event', infoObj.afterpop)));
+    if (infoObj.add){
+        this.addEventListener(element, 'add', ((infoObj.add instanceof Function) ? infoObj.add : new Function('event', infoObj.add)));
+        infoObj.add(infoObj);
+    }
+    if (infoObj.ok)
+        this.addEventListener(element, 'ok', ((infoObj.ok instanceof Function) ? infoObj.ok : new Function('event', infoObj.ok)));
+    if (infoObj.close)
+        this.addEventListener(element, 'close', ((infoObj.close instanceof Function) ? infoObj.close : new Function('event', infoObj.close)));
+    if (infoObj.afterclose)
+        this.addEventListener(element, 'afterclose', ((infoObj.afterClose instanceof Function) ? infoObj.afterclose : new Function('event', infoObj.afterclose)));
 };
 
 
