@@ -23,9 +23,10 @@
 - Confirm
 - Loading
 - Preview
+- Focus
+- Theme
 - Event
 - Functions
-- Theme
 - Example
 ```
 

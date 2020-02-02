@@ -10,16 +10,16 @@
 ```
 
 #### ※ 표
- 종류 | 특징
-------|-----
-add | POP노드가 등록될 때 
-pop | POP노드를 열 때
-close | POP노드를 닫을 때
-afterPop | POP노드를 연 후에
-afterCLose | POP노드를 닫은 후에
-beforefirstpop | 처음 POP노드가 열릴 때
-afterlastpop | 처음 열었던 POP노드가 닫힐 때
-afterdetect | 탐지(detect) 후에
+ 종류 | Template속성 | Event Data | 설명
+------|--------------|------------|-------
+add | data-event-add | {element, ...} | POP노드가 등록될 때 
+pop | data-event-pop | {element, ...} | POP노드를 열 때
+close | data-event-close | {element, ...} | POP노드를 닫을 때
+afterpop | data-event-close | {element, ...} | POP노드를 연 후에
+afterclose | data-event-close | {element, ...} | POP노드를 닫은 후에
+beforefirstpop | None | null | 처음 POP노드가 열릴 때
+afterlastpop | None | null | 처음 열었던 POP노드가 닫힐 때
+afterdetect | None | null | 탐지(detect) 후에
     
     
 
