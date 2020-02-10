@@ -136,7 +136,7 @@ PopMan.EVENT_ADD = 'add';
 PopMan.EVENT_POP = 'pop';
 PopMan.EVENT_CLOSE = 'close';
 PopMan.EVENT_AFTERPOP = 'afterpop';
-PopMan.EVENT_AFTERPOP = 'afterclose';
+PopMan.EVENT_AFTERCLOSE = 'afterclose';
 PopMan.EVENT_AFTERDETECT = 'afterdetect';
 PopMan.EVENT_BEFOREFIRSTPOP = 'beforefirstpop';
 PopMan.EVENT_AFTERLASTPOP = 'afterlastpop';
@@ -469,7 +469,7 @@ PopMan.prototype.setPopEvent = function(infoObj){
     if (infoObj.close)
         this.addEventListener(element, 'close', ((infoObj.close instanceof Function) ? infoObj.close : new Function('event', infoObj.close)));
     if (infoObj.afterclose)
-        this.addEventListener(element, 'afterclose', ((infoObj.afterClose instanceof Function) ? infoObj.afterclose : new Function('event', infoObj.afterclose)));
+        this.addEventListener(element, 'afterclose', ((infoObj.afterclose instanceof Function) ? infoObj.afterclose : new Function('event', infoObj.afterclose)));
 };
 
 
