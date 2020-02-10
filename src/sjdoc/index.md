@@ -154,15 +154,18 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
     *@* *!* *@*
     ```html
     <body>
-        Hello Popman
-        <button onclick="popman.alert('Alert!');">ALERT</button>
+        Hello Popman - Alert
+        <button onclick="alertSomething();">ALERT</button>
     </body>
     <script>
-        popman.setup({modeTest:true, alertExp:'200/100'});   
-        popman.alert('Alert Something', function(){
-            alert('Alert! Ok!');
-            return true;
-        });        
+        popman.setup({modeTest:true, alertExp:'200/100'});
+        function alertSomething(){
+            popman.alert('Alert Something', function(){
+                alert('Alert! Ok!');
+                return true;
+            });
+        }   
+        alertSomething();
     </script>
     ```
   
@@ -173,21 +176,24 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
     *@* *!* *@*
     ```html
     <body>
-        Hello Popman
-        <button onclick="popman.confirm('Confirm!');">CONFIRM</button>
+        Hello PopMan - Confirm
+        <button onclick="confirmSomething();">CONFIRM</button>
     </body>
     <script>
         popman.setup({modeTest:true, confirmExp:'300/150'});
-        popman.confirm('Confirm Something',
-            function(){
-                alert('OK!');
-                return true;
-            },
-            function(){
-                alert('Cancel!');
-                return true;
-            },
-        );        
+        function confirmSomething(){
+            popman.confirm('Confirm Something',
+                function(){
+                    alert('OK!');
+                    return true;
+                },
+                function(){
+                    alert('Cancel!');
+                    return true;
+                }
+            );    
+        }   
+        confirmSomething();
     </script>
     ```
     
@@ -198,12 +204,11 @@ For convenience, 1-1 code, which loads and creates a Library in the example, is 
     *@* *!* *@*
     ```html
     <body>
-        Hello Popman
+        Hello Popman- Loading
         <button onclick="loadSomething();">LOAD</button>
     </body>
     <script>
         popman.setup({modeTest:true, loadingExp:'80%/100'}); 
-        
         function loadSomething(){
             popman.loading('LOADING..  Something..', function(resolve, reject){ 
                 setTimeout(function(){ 
