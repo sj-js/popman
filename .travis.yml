@@ -12,22 +12,23 @@ cache:
     - "node_modules"
 
 before_deploy:
+  - npm install
   - pwd
   - ls dist/js/
-  
+
 deploy:
   - provider: releases
+    edge: true
     api_key:
       secure: "c1w+jXyxc7V7h23+cqEDVhU0gvuKsVCK7VtqyM5BLaE1CMdc8RUKeQTs8CSFZx2H3Pzcnr3+y2/ikaC/4/Vr3sk0M26jZwrT79rlOo+jvzgdsCLeaVneL6yO0VtJtUAZabcXsNqKDd4UN1DmiXTuGOI83L4KPh+F60o91phBQHq5CspE6WNIn0OmYz6cf0f60FUILf7vaTN9V1Oy0VKfl6LwQh7bQbxe1uNEkAIlR+aG5sVXfh07/Pz143eFOKcPaZDdJnHS2FH9FFrszf1V9owCQFVjfOXrOwxeEWOdAAs9SBvxIXEBzBokVcvXSuALzkVQUs0SjmieLd0T6yffxnXvHPlfxaWH+ti6pYI2IU4HmEEiQ2uOc4Hv5PUjl8YTUO6fnFWMZ7sVwfvxtRM5EksELHq2YIMzVKsLb90+up3n1uvazeh4J6ZLenmKzoUvPd9TvkZmXvGr1DXZONCKmfz/TYxwK1O1dOmgLf86VsjvmxV9WWLcbC9gPHhigTYckZqM9Nd5vd2KivNPyEZFAyoLuTSYILuINn+gvLxjYwJL/9QYM3CV2s1EPcZreFt+44kQPfh72KAyMb3ICfpUylgXOuPqMEFSW/9LgEtGBhQdB34wgb4b834VxK3FOjCunUfjZRGwAVayLrMNtPq6/wG3D7az4AjzUM5FTwn60l8="
     file:
       - dist/js/popman.min.js
-    skip_cleanup: true
     on:
       repo: sj-js/popman
       branch: master
   - provider: npm
+    edge: true
     email: "$NPM_EMAIL"
     api_key: "$NPM_API_TOKEN"
-    skip_cleanup: true
     on:
       branch: master
